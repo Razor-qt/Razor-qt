@@ -4,8 +4,14 @@ ServiceTypes=RazorPanel/Plugin
 Name=Screensaver
 Name[pl]=Wygaszacz ekranu
 Name[ru]=Хранитель экрана
+<<<<<<< HEAD
 Name[hu]=Képernyővédő
 Comment=Activate a screensaver and/or lock the screen
 Comment[pl]=Aktywuje wygaszacz ekranu oraz/albo blokuje ekran
 Comment[ru]=Вклучение хранителя экрана и блокировка его
 Comment[hu]=A képernyővédő aktiválása és/vagy a képernyő zárolása
+=======
+Comment=Activate a screensaver and/or lock the screen
+Comment[pl]=Aktywuje wygaszacz ekranu oraz/albo blokuje ekran
+Comment[ru]=Вклучение хранителя экрана и блокировка его
+>>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea

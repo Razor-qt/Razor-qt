@@ -8,7 +8,11 @@ Name[ru]=Часы
 Comment[ru]=Часы
 
 Name[pl]=Zegar
+<<<<<<< HEAD
 Comment[pl]=Zegar
 
 Name[hu]=Óra
 Comment[hu]=Óra
+=======
+Comment[pl]=Zegar
+>>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea

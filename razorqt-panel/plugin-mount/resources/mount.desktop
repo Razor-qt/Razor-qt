@@ -7,5 +7,8 @@ Name[ru]=Сменные носители
 Comment[ru]=Менеджер сменных носителей (USB, CD, DVD, и.т.д.)
 Name[pl]=Menedżer urządzeń
 Comment[pl]=Menedżer urządzeń (USB, CD, DVD, ...)
+<<<<<<< HEAD
 Name[hu]=Cserélhető eszköz
 Comment[hu]=Cserélhetőeszköz-kezelő (USB, CD, DVD, …)
+=======
+>>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea

@@ -4,8 +4,14 @@ ServiceTypes=RazorPanel/Plugin
 Name=Task Manager
 Name[ru]=Панель задач
 Name[pl]=Pasek zadań
+<<<<<<< HEAD
 Name[hu]=Feladatkezelő
 Comment=Switch between running applications
 Comment[ru]=Переключение между запущенными программами
 Comment[pl]=Przełączaj się pomiędzy otwartymi aplikacjami
 Comment[hu]=Váltás a futú alkalmazások között
+=======
+Comment=Switch between running applications
+Comment[ru]=Переключение между запущенными программами
+Comment[pl]=Przełączaj się pomiędzy otwartymi aplikacjami
+>>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea

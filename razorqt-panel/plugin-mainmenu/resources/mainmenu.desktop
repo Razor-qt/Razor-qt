@@ -4,8 +4,14 @@ ServiceTypes=RazorPanel/Plugin
 Name=Application menu
 Name[ru]=Меню программ
 Name[pl]=Menu
+<<<<<<< HEAD
 Name[hu]=Alkalmazásmenü
 Comment=Menu based application launcher
 Comment[ru]=Меню запуска программ
 Comment[pl]=Główne menu
 Comment[hu]=Alkalmazásindító alapú menü
+=======
+Comment=Menu based application launcher
+Comment[ru]=Меню запуска программ
+Comment[pl]=Główne menu
+>>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea

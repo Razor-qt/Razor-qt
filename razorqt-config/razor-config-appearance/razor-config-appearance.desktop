@@ -14,8 +14,11 @@ GenericName=Razor Appearance Configuration
 Name[ru]=Настройки внешнего вида
 Comment[ru]=Настройки внешнего вида Razor
 GenericName[ru]=Настройки внешнего вида
+<<<<<<< HEAD
 
 Name[hu]=Razor megjelenésbeállító
 Comment[hu]=A Razor asztal megjelenésének beállítása
 GenericName[hu]=Razor megjelenésbeállító
 
+=======
+>>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea
