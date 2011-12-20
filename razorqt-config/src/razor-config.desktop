@@ -16,12 +16,8 @@ GenericName[ru]=Центр настроек Razor
 
 Name[pl]=Panel sterowania Razor
 Comment[pl]=Wszystkie ustawienia Razor-Qt
-<<<<<<< HEAD
 GenericName[pl]=Panel sterowania Razor
 
 Name[hu]=Razor beállítóközpont
 Comment[hu]=A Razor-Qt modulok beállítása
 GenericName[hu]=Razor beállítóközpont
-=======
-GenericName[pl]=Panel sterowania Razor
->>>>>>> e2257aa6e9ca2e7b93c482fcc705ec8effbdc2ea
