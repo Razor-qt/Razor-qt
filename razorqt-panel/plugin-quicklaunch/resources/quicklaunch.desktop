@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=RazorPanel/Plugin
+Name=Quicklaunch
+Name[ru]=Панель запуска
+Name[pl]=Szybkie uruchamianie
+Name[hu]=Gyorsindító
+Comment=Launch your favorite Applications
+Comment[ru]=Панель с избранными программами
+Comment[pl]=Uruchamiaj Twoje ulubione aplikacje
+Comment[hu]=A kedvenc alkalmazásainak indítása

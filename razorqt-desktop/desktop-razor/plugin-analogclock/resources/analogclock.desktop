@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=RazorDesktop/Plugin
+Name=Clock
+Comment=Clock
+
+Name[ru]=Часы
+Comment[ru]=Часы
+
+Name[pl]=Zegar
+Comment[pl]=Zegar
+
+Name[hu]=Óra
+Comment[hu]=Óra

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=RazorPanel/Plugin
+Name=Task Manager
+Name[ru]=Панель задач
+Name[pl]=Pasek zadań
+Name[hu]=Feladatkezelő
+Comment=Switch between running applications
+Comment[ru]=Переключение между запущенными программами
+Comment[pl]=Przełączaj się pomiędzy otwartymi aplikacjami
+Comment[hu]=Váltás a futú alkalmazások között
