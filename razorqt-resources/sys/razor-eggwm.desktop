@@ -6,8 +6,11 @@ Exec=razor-session-eggwm
 Name=Razor Desktop (eggwm)
 Comment=Qt4 Desktop Environment
 
+Name[pl]=Pulpit Razor(eggwm)
+Comment[pl]=Środowisko graficzne Qt4
+
 Name[ru]=Рабочий стол Razor (eggwm)
 Comment[ru]=Рабочий стол на Qt
 
-Name[pl]=Pulpit Razor(eggwm)
-Comment[pl]=Środowisko graficzne Qt4
+Name[sk]=Prostredie Razor (eggwm)
+Comment[sk]=Pracovné prostredie v Qt4

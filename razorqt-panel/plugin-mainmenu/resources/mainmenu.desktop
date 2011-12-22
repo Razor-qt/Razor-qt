@@ -2,8 +2,13 @@
 Type=Service
 ServiceTypes=RazorPanel/Plugin
 Name=Application menu
-Name[ru]=Меню программ
-Name[pl]=Menu
 Comment=Menu based application launcher
-Comment[ru]=Меню запуска программ
+
+Name[pl]=Menu
 Comment[pl]=Główne menu
+
+Name[ru]=Меню программ
+Comment[ru]=Меню запуска программ
+
+Name[sk]=Menu aplikácií
+Comment[sk]=Spúšťanie aplikácií z menu

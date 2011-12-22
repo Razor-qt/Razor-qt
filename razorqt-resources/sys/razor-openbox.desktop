@@ -7,8 +7,11 @@ TryExec=openbox
 Name=Razor Desktop (openbox)
 Comment=Qt4 Desktop Environment
 
+Name[pl]=Pulpit Razor (openbox)
+Comment[pl]=Środowisko graficzne Qt4
+
 Name[ru]=Рабочий стол Razor (openbox)
 Comment[ru]=Рабочий стол на Qt
 
-Name[pl]=Pulpit Razor (openbox)
-Comment[pl]=Środowisko graficzne Qt4
+Name[sk]=Prostredie Razor (openbox)
+Comment[sk]=Pracovné prostredie v Qt4

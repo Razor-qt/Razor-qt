@@ -7,8 +7,11 @@ TryExec=kwin
 Name=Razor Desktop (kwin)
 Comment=Qt4 Desktop Environment
 
+Name[pl]=Pulpit Razor (kwin)
+Comment[pl]=Środowisko graficzne Qt4
+
 Name[ru]=Рабочий стол Razor (kwin)
 Comment[ru]=Рабочий стол на Qt
 
-Name[pl]=Pulpit Razor (kwin)
-Comment[pl]=Środowisko graficzne Qt4
+Name[sk]=Prostredie Razor (kwin)
+Comment[sk]=Pracovné prostredie v Qt4

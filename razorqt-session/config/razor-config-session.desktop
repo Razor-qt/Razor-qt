@@ -10,10 +10,14 @@ Name=Razor Session Configurator
 Comment=Configure Razor-Qt session module
 GenericName=Razor Session Configurator
 
+Name[pl]=Ustawienia sesji Razor
+Comment[pl]=Ustawienia sesji Razor-Qt
+GenericName[pl]=Ustawienia sesji Razor
+
 Name[ru]=Настройки сесии Razor
 Comment[ru]=Настройки сессии для Razor-Qt
 GenericName[ru]=Настройки сесии Razor
 
-Name[pl]=Ustawienia sesji Razor
-Comment[pl]=Ustawienia sesji Razor-Qt
-GenericName[pl]=Ustawienia sesji Razor
+Name[sk]=Nastavenie relácie
+Comment[sk]=Nastavenie relácie prostredia Razor-Qt
+GenericName[sk]=Nastavenie relácie prostredia Razor
