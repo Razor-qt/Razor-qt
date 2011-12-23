@@ -15,6 +15,6 @@ fi
 
 for i in `find $ROOT -name translate.sh`; do
 	cd `dirname $i`
-	./translate.sh
+	./translate.sh "$@"
 	cd - > /dev/null
 done
