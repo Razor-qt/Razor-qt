@@ -1,4 +1,5 @@
 /* BEGIN_COMMON_COPYRIGHT_HEADER
+ * (c)LGPL3+
  *
  * Razor - a lightweight, Qt based, desktop toolset
  * http://razor-qt.org
@@ -701,15 +702,10 @@ void RazorPanel::show()
 
     Q_D(RazorPanel);
 
-    //setPalette(QPalette("#0814ff"));
-    //setAutoFillBackground(true);
-    //QWidget::setWindowOpacity(50);
-
     QWidget::show();
     d->realign();
     d->reTheme();
     xfitMan().moveWindowToDesktop(this->effectiveWinId(), -1);
-
 }
 
 
