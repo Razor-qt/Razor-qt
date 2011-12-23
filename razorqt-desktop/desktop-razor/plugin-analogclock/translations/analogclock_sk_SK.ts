@@ -1,13 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0">
-<context>
-    <name>Clock</name>
-    <message>
-        <source>Clock</source>
-        <translation>Hodiny</translation>
-    </message>
-</context>
+<!DOCTYPE TS><TS>
 <context>
     <name>ConfigureDialog</name>
     <message>
@@ -17,6 +8,13 @@
     <message>
         <source>Show &amp;seconds hand</source>
         <translation>Zobrazovať &amp;sekundovú ručičku</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Clock</source>
+        <translation>Hodiny</translation>
     </message>
 </context>
 </TS>
