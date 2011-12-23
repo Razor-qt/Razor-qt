@@ -4,11 +4,15 @@ ServiceTypes=RazorDesktop/Plugin
 Name=Icon View
 Comment=Display content (as icons) of the specified directory
 
-Name[pl]=Ikony
-Comment[pl]=Wyświetla zwaratość wybranego folderu jaki ikony
-
 Name[es]=Vista de Íconos
 Comment[es]=Muestra el contenido del directorio especificado como íconos
 
 Name[hu]=Ikonnézet
 Comment[hu]=A megadott mappa tartalmának megjelenítése ikonokként
+
+Name[pl]=Ikony
+Comment[pl]=Wyświetla zwaratość wybranego folderu jaki ikony
+
+Name[sk]=Ikony
+Comment[sk]=Zobrazenie obsahu určeného adresára vo forme ikon
+

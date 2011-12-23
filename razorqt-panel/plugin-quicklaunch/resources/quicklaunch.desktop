@@ -2,12 +2,20 @@
 Type=Service
 ServiceTypes=RazorPanel/Plugin
 Name=Quicklaunch
-Name[ru]=Панель запуска
-Name[pl]=Szybkie uruchamianie
-Name[es]=Lanzador rápido
-Name[hu]=Gyorsindító
 Comment=Launch your favorite Applications
-Comment[ru]=Панель с избранными программами
-Comment[pl]=Uruchamiaj Twoje ulubione aplikacje
+
+Name[es]=Lanzador rápido
 Comment[es]=Lanze sus aplicaciones favoritas
+
+Name[hu]=Gyorsindító
 Comment[hu]=A kedvenc alkalmazásainak indítása
+
+Name[pl]=Szybkie uruchamianie
+Comment[pl]=Uruchamiaj Twoje ulubione aplikacje
+
+Name[ru]=Панель запуска
+Comment[ru]=Панель с избранными программами
+
+Name[sk]=Rýchle spustenie
+Comment[sk]=Spúšťanie vašich obľúbených aplikácií
+
