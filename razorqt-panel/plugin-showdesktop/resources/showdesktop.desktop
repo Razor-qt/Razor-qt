@@ -4,6 +4,12 @@ ServiceTypes=RazorPanel/Plugin
 Name=Show Desktop
 Comment=Minimize all windows and show the desktop
 
+Name[es]=Mostrar escritorio
+Comment[es]=Minimiza todas las ventanas y muestra el escritorio
+
+Name[hu]=Az asztal megjelenítése
+Comment[hu]=Minimalizálja az összes ablakot és megjeleníti az asztalt
+
 Name[pl]=Pokaż pulpit
 Comment[pl]=Minimalizuje wszystkie okna i pokazuje pulpit
 
@@ -12,3 +18,4 @@ Comment[ru]=Сворачивает все окна и показывает ра�
 
 Name[sk]=Zobraziť plochu
 Comment[sk]=Minimalizuje všetky okná a zobrazí plochu
+

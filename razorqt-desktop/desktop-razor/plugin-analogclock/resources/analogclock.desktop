@@ -4,6 +4,12 @@ ServiceTypes=RazorDesktop/Plugin
 Name=Clock
 Comment=Clock
 
+Name[es]=Reloj
+Comment[es]=Reloj
+
+Name[hu]=Óra
+Comment[hu]=Óra
+
 Name[pl]=Zegar
 Comment[pl]=Zegar
 
@@ -12,3 +18,4 @@ Comment[ru]=Часы
 
 Name[sk]=Hodiny
 Comment[sk]=Hodiny
+

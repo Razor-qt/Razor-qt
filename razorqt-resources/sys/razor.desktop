@@ -6,6 +6,12 @@ Exec=razor-session
 Name=Razor Desktop
 Comment=Qt4 Desktop
 
+Name[es]=Escritorio Razor
+Comment[es]=Escritorio Qt4
+
+Name[hu]=Razor asztal
+Comment[hu]=Qt4 asztali környezet
+
 Name[pl]=Pulpit Razor
 Comment[pl]=Pulpit Qt4
 
@@ -14,3 +20,4 @@ Comment[ru]=Рабочий стол  на Qt
 
 Name[sk]=Prostredie Razor
 Comment[sk]=Pracovné prostredie v Qt4
+

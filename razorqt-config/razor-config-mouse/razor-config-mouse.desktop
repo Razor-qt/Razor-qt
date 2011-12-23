@@ -10,6 +10,14 @@ Name=Razor Mouse Configurator
 Comment=Configure X11 mouse
 GenericName=Razor Mouse Configurator
 
+Name[es]=Configuración de Ratón Razor
+Comment[es]=Configura un ratón X11
+GenericName[es]=Configuración de Ratón Razor
+
+Name[hu]=Razor egérbeállító
+Comment[hu]=Az X11 egér beállítása
+GenericName[hu]=Razor egérbeállító
+
 Name[pl]=Ustawienia myszy Razor-Qt
 Comment[pl]=Konfiguracja myszy w Razor-Qt
 GenericName[pl]=Ustawuenua myszy Razor-Qt
@@ -21,3 +29,4 @@ GenericName[ru]=Настройки мыши
 Name[sk]=Nastavenie myši
 Comment[sk]=Nastavenie myši X11 prostredia Razor-Qt
 GenericName[sk]=Nastavenie myši
+

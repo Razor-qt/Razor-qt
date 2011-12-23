@@ -4,6 +4,12 @@ ServiceTypes=RazorPanel/Plugin
 Name=System tray
 Comment=Access hidden applications minimized in the system tray
 
+Name[es]=Bandeja del sistema
+Comment[es]=Accede a aplicaciones ocultas minimizadas en la bandeja del sistema
+
+Name[hu]=Paneltálca
+Comment[hu]=A paneltálcára minimalizált, rejtett alkalmazások elérése
+
 Name[pl]=Tacka systemowa
 Comment[pl]=Udostępnia ukryte aplikacje
 
@@ -12,3 +18,4 @@ Comment[ru]=Значки программ, свернутых в системн�
 
 Name[sk]=Oznamovacia oblasť
 Comment[sk]=Prístup k skrytým aplikáciám minimalizovaným v oznamovacej oblasti
+

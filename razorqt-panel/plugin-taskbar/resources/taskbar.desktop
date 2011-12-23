@@ -4,6 +4,12 @@ ServiceTypes=RazorPanel/Plugin
 Name=Task Manager
 Comment=Switch between running applications
 
+Name[es]=Administrador de Tareas
+Comment[es]=Cambia entre aplicaciones activas
+
+Name[hu]=Feladatkezelő
+Comment[hu]=Váltás a futú alkalmazások között
+
 Name[pl]=Pasek zadań
 Comment[pl]=Przełączaj się pomiędzy otwartymi aplikacjami
 
@@ -12,3 +18,4 @@ Comment[ru]=Переключение между запущенными прог�
 
 Name[sk]=Správca úloh
 Comment[sk]=Prepínanie medzi bežiacimi aplikáciami
+

@@ -4,6 +4,12 @@ ServiceTypes=RazorPanel/Plugin
 Name=Clock
 Comment=Clock and calendar
 
+Name[es]=Reloj
+Comment[es]=Reloj y calendario
+
+Name[hu]=Óra
+Comment[hu]=Óra és naptár
+
 Name[pl]=Zegar
 Comment[pl]=Zegar oraz kalendarz
 
@@ -12,3 +18,4 @@ Comment[ru]=Часы и календарь
 
 Name[sk]=Hodiny
 Comment[sk]=Hodiny a kalendár
+
