@@ -1,5 +1,5 @@
 /* BEGIN_COMMON_COPYRIGHT_HEADER
- * (c)LGPL3+
+ * (c)LGPL2+
  *
  * Razor - a lightweight, Qt based, desktop toolset
  * http://razor-qt.org
@@ -11,7 +11,7 @@
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,11 +47,16 @@ public:
 
 public slots:
     void saveSettings();
-    void spinBoxHeightValueChanged(int q);
-    void spinBoxWidthValueChanged(int q);
-    void comboBoxWidthTypeIndexChanged(int q);
-    void comboBoxAlignmentIndexChanged(int q);
-
+    void spinBoxHeightValueChanged(int value);
+    void spinBoxWidthValueChanged(int value);
+    void comboBoxWidthTypeIndexChanged(int index);
+    void comboBoxAlignmentIndexChanged(int index);
+    void radioButtonColorToggled(bool state);
+    void radioButtonImageToggled(bool state);
+    void radioButtonSystemToggled(bool state);
+    void pushButtonColorClicked();
+    void pushButtonImageClicked();
+    //void SliderTransperentValueChanged(int value);
     
 private:
     Ui::ConfigPanelDialog *ui;
@@ -63,6 +68,16 @@ private:
     int mWidthType;
     int mWidth;
     int mAlignment;
+    int mBackgroundType;
+    int mTransperent;
+    QString mImagePath;
+    QColor mColor;
+    int strToAlignment(const QString& str);
+    QString alignmentToStr(int align);
+    QString widthTypeToStr(int type);
+    int strToWidthType(const QString& str);
+    QString backgroundTypeToStr(int type);
+    int strToBackgroundType(const QString& str);
 
 };
 

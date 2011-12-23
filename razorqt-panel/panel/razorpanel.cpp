@@ -1,5 +1,4 @@
 /* BEGIN_COMMON_COPYRIGHT_HEADER
- * (c)LGPL3+
  *
  * Razor - a lightweight, Qt based, desktop toolset
  * http://razor-qt.org
@@ -7,6 +6,7 @@
  * Copyright: 2010-2011 Razor team
  * Authors:
  *   Alexander Sokoloff <sokoloff.a@gmail.ru>
+ *   Marat "Morion" Talipov <morion-self@mail.ru>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
@@ -57,15 +57,18 @@
 #include <razorqt/xfitman.h>
 
 
-#define CFG_PANEL_GROUP     "panel"
+#define CFG_PANEL_GROUP             "panel"
 
-#define CFG_KEY_SCREENNUM   "desktop"
-#define CFG_KEY_POSITION    "position"
-#define CFG_KEY_PLUGINS     "plugins"
-#define CFG_KEY_HEIGHT      "height"
-#define CFG_KEY_WIDTH       "width"
-#define CFG_KEY_WIDTH_TYPE  "widthType"
-#define CFG_KEY_ALIGNMENT   "alignment"
+#define CFG_KEY_SCREENNUM           "desktop"
+#define CFG_KEY_POSITION            "position"
+#define CFG_KEY_PLUGINS             "plugins"
+#define CFG_KEY_HEIGHT              "height"
+#define CFG_KEY_WIDTH               "width"
+#define CFG_KEY_WIDTH_TYPE          "widthType"
+#define CFG_KEY_ALIGNMENT           "alignment"
+#define CFG_KEY_BACKGROUND          "background"
+#define CFG_KEY_BACKGROUND_TYPE     "backgroundType"
+//#define CFG_KEY_TRANSPERENT         "transperent"
 
 
 #define CFG_FULLKEY_PLUGINS "panel/plugins"
@@ -102,6 +105,7 @@ QString positionToStr(RazorPanel::Position position)
 
     return "";
 }
+
 
 
 /************************************************
@@ -323,10 +327,35 @@ RazorPanelPlugin* RazorPanelPrivate::loadPlugin(const RazorPluginInfo* pluginInf
  ************************************************/
 void RazorPanelPrivate::reTheme()
 {
-    qApp->setStyleSheet(razorTheme->qss("panel"));
+    // This code need to improve. Maybe, use QRegExpr
+    // I'll do it later
+    // QRegExp qq("RazorPanel\\s*\\{.*background-color:[.]");
+
+    mSettings->beginGroup(CFG_PANEL_GROUP);
+    QString mBackgroundType = mSettings->value(CFG_KEY_BACKGROUND_TYPE, 0).toString();
+    //int mTransperent = mSettings->value(CFG_KEY_TRANSPERENT, 1).toInt();
+    QString mColor;
+    QString mImagePath;
+    QString mStyleSheet=razorTheme->qss("panel");
+    int tmp=mStyleSheet.indexOf("RazorPanel");
+    int firstBorder=mStyleSheet.indexOf("background-color",tmp);
+    int lastBorder=mStyleSheet.indexOf(";",firstBorder);
+
+    if (mBackgroundType.toUpper()=="COLOR")
+    {
+            mColor = mSettings->value(CFG_KEY_BACKGROUND, "#ffffff").toString();
+            mStyleSheet.replace(firstBorder,lastBorder-firstBorder, "background-color: " + mColor);
+    }
+    if (mBackgroundType.toUpper()=="IMAGE")
+    {
+         mImagePath = mSettings->value(CFG_KEY_BACKGROUND, "none").toString();
+         mStyleSheet.replace(firstBorder,lastBorder-firstBorder, "border-image: url(" + mImagePath + ")");
+    }
+
+    mSettings->endGroup();
+    qApp->setStyleSheet(mStyleSheet);
     realign();
 }
-
 
 
 /************************************************
@@ -358,50 +387,51 @@ void RazorPanelPrivate::realign()
     // Panel height: load from file, else - use default
     mSettings->beginGroup(CFG_PANEL_GROUP);
     int mHeight = mSettings->value(CFG_KEY_HEIGHT, sizeHint.height()).toInt();
-    int mWidthType = mSettings->value(CFG_KEY_WIDTH_TYPE, 0).toInt();
+    QString mWidthType = mSettings->value(CFG_KEY_WIDTH_TYPE, 0).toString();
     int mWidth = mSettings->value(CFG_KEY_WIDTH, 100).toInt();
-    int mAlignment = mSettings->value(CFG_KEY_ALIGNMENT, 0).toInt();
+    QString mAlignment = mSettings->value(CFG_KEY_ALIGNMENT, 0).toString();
     mSettings->endGroup();
 
     switch (mPosition)
     {
         case RazorPanel::PositionTop:
-        rect.setHeight(mHeight);
+            rect.setHeight(mHeight);
 
-        if (mWidthType==0)   // size in percents
-        {
-            if (mAlignment==2)      //align - center
-                rect.setLeft((screen.width()-(screen.width()*mWidth/100))/2);
-            if (mAlignment==1) //align - rigth
-                rect.setLeft(screen.width()-(screen.width()*mWidth/100));
-            rect.setWidth(screen.width()*mWidth/100);
-        }
-        else                // size in pixels
-        {
-            if (mAlignment==2)      //align - center
-                rect.setLeft((screen.width()-mWidth)/2);
-            if (mAlignment==1) //align - rigth
-                rect.setLeft(screen.width()-mWidth);
-            rect.setWidth(mWidth);
-        }
+            if (mWidthType.toUpper()=="PERCENT")
+            {
+                if (mAlignment.toUpper()=="CENTER")
+                    rect.setLeft((screen.width()-(screen.width()*mWidth/100))/2);
+                if (mAlignment.toUpper()=="RIGHT")
+                    rect.setLeft(screen.width()-(screen.width()*mWidth/100));
+                rect.setWidth(screen.width()*mWidth/100);
+            }
+            if (mWidthType.toUpper()=="PIXEL")
+            {
+                if (mAlignment.toUpper()=="CENTER")
+                    rect.setLeft((screen.width()-mWidth)/2);
+                if (mAlignment.toUpper()=="RIGHT")
+                    rect.setLeft(screen.width()-mWidth);
+                rect.setWidth(mWidth);
+            }
             break;
 
         case RazorPanel::PositionBottom:
             rect.setHeight(mHeight);
 
-            if (mWidthType==0)   // size in percents
+            if (mWidthType.toUpper()=="PERCENT")
             {
-                if (mAlignment==2)      //align - center
+                if (mAlignment.toUpper()=="CENTER")
                     rect.setLeft((screen.width()-(screen.width()*mWidth/100))/2);
-                if (mAlignment==1) //align - rigth
+                if (mAlignment.toUpper()=="RIGHT")
                     rect.setLeft(screen.width()-(screen.width()*mWidth/100));
                 rect.setWidth(screen.width()*mWidth/100);
             }
-            else                // size in pixels
+
+            if (mWidthType.toUpper()=="PIXEL")
             {
-                if (mAlignment==2)      //align - center
+                if (mAlignment.toUpper()=="CENTER")
                     rect.setLeft((screen.width()-mWidth)/2);
-                if (mAlignment==1) //align - rigth
+                if (mAlignment.toUpper()=="RIGHT")
                     rect.setLeft(screen.width()-mWidth);
                 rect.setWidth(mWidth);
             }
@@ -668,10 +698,18 @@ void RazorPanelPrivate::addPlugin(const RazorPluginInfo &pluginInfo)
  ************************************************/
 void RazorPanel::show()
 {
+
     Q_D(RazorPanel);
+
+    //setPalette(QPalette("#0814ff"));
+    //setAutoFillBackground(true);
+    //QWidget::setWindowOpacity(50);
+
     QWidget::show();
     d->realign();
+    d->reTheme();
     xfitMan().moveWindowToDesktop(this->effectiveWinId(), -1);
+
 }
 
 
@@ -921,5 +959,3 @@ void CursorAnimation::updateCurrentValue(const QVariant &value)
 {
     QCursor::setPos(value.toPoint());
 }
-
-
