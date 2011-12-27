@@ -7,6 +7,7 @@
  * Copyright: 2010-2011 Razor team
  * Authors:
  *   Alexander Sokoloff <sokoloff.a@gmail.ru>
+ *   Marat "Morion" Talipov <morion-self@mail.ru>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public

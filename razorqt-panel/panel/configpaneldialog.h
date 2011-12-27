@@ -47,11 +47,16 @@ public:
 
 public slots:
     void saveSettings();
-    void spinBoxHeightValueChanged(int q);
-    void spinBoxWidthValueChanged(int q);
-    void comboBoxWidthTypeIndexChanged(int q);
-    void comboBoxAlignmentIndexChanged(int q);
-
+    void spinBoxHeightValueChanged(int value);
+    void spinBoxWidthValueChanged(int value);
+    void comboBoxWidthTypeIndexChanged(int index);
+    void comboBoxAlignmentIndexChanged(int index);
+    void radioButtonColorToggled(bool state);
+    void radioButtonImageToggled(bool state);
+    void radioButtonSystemToggled(bool state);
+    void pushButtonColorClicked();
+    void pushButtonImageClicked();
+    //void SliderTransperentValueChanged(int value);
     
 private:
     Ui::ConfigPanelDialog *ui;
@@ -63,6 +68,16 @@ private:
     int mWidthType;
     int mWidth;
     int mAlignment;
+    int mBackgroundType;
+    int mTransperent;
+    QString mImagePath;
+    QColor mColor;
+    int strToAlignment(const QString& str);
+    QString alignmentToStr(int align);
+    QString widthTypeToStr(int type);
+    int strToWidthType(const QString& str);
+    QString backgroundTypeToStr(int type);
+    int strToBackgroundType(const QString& str);
 
 };
 
