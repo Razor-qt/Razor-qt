@@ -747,9 +747,23 @@ bool XdgDesktopFile::isShow(const QString& environment) const
     if (value("NoDisplay").toBool())
         return false;
 
+    // The file is inapplicable to the current environment
+    if (!isApplicable(true, environment))
+        return false;
+
+    d->mIsShow = True;
+    return true;
+}
+
+
+/************************************************
+
+ ************************************************/
+bool XdgDesktopFile::isApplicable(bool excludeHidden, const QString& environment) const
+{
     // Hidden should have been called Deleted. It means the user deleted
     // (at his level) something that was present
-    if (value("Hidden").toBool())
+    if (excludeHidden && value("Hidden").toBool())
         return false;
 
     // A list of strings identifying the environments that should display/not
@@ -775,7 +789,6 @@ bool XdgDesktopFile::isShow(const QString& environment) const
     if (!s.isEmpty() && ! checkTryExec(s))
         return false;
 
-    d->mIsShow = True;
     return true;
 }
 
@@ -804,7 +817,7 @@ QString expandDynamicUrl(QString url)
 QString XdgDesktopFile::url() const
 {
     if (type() != LinkType)
-        return "";
+        return QString();
 
    QString url;
 
@@ -817,7 +830,7 @@ QString XdgDesktopFile::url() const
     if (!url.isEmpty())
         return url;
 
-    return "";
+    return QString();
 }
 
 
@@ -846,7 +859,7 @@ QString findDesktopFile(const QString& dirName, const QString& desktopName)
         }
     }
 
-    return "";
+    return QString();
 }
 
 
@@ -865,7 +878,7 @@ QString findDesktopFile(const QString& desktopName)
             return f;
     }
 
-    return "";
+    return QString();
 }
 
 

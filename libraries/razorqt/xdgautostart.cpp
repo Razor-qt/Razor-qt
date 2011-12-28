@@ -8,6 +8,7 @@
  * Authors:
  *   Petr Vanek <petr@scribus.info>
  *   Chris "VdoP" Regali
+ *   Alec Moskvin <alecm@gmx.com>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
@@ -28,6 +29,7 @@
 
 
 #include <QtCore/QtDebug>
+#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
 #include "xdgautostart.h"
@@ -45,15 +47,14 @@
  * @brief updates the list of autostart items
  * gets a list of paths and calls addDirtoList for each path!
  */
-
 void XdgAutoStart::updateList()
 {
     qDebug()<< "XdgAutoStart: getting configpaths";
     QStringList pathList;
     QStringList config_dirs = XdgDirs::configDirs();
+    pathList.append(XdgDirs::configHome()+"/autostart/");
     for (int i = 0; i < config_dirs.count(); i++)
         pathList.append(config_dirs.at(i)+"/autostart/");
-    pathList.push_back(XdgDirs::configHome()+"/autostart/");
 
     qDebug() << "XdgAutoStart: beginning building list";
 
@@ -61,8 +62,7 @@ void XdgAutoStart::updateList()
     {
         addDirtoList(pathList.at(i));
     }
-    qDebug() << "XdgAutoStart: found "<<m_list.count()<< " items for the autostart...";
-    cleanList();
+    qDebug() << "XdgAutoStart: found "<<mMap.count()<< " items for the autostart...";
 }
 
 /**
@@ -79,14 +79,22 @@ void XdgAutoStart::addDirtoList(const QString & _dir)
     QStringList filelist = directory.entryList();
     for (int i =0; i < filelist.count(); i++)
     {
-        XdgDesktopFile * f = new XdgDesktopFile();
-        f->load(_dir+filelist.at(i));
-        if (f->isShow())
-            m_list.append(f);
-        else
+        QString fileName = filelist.at(i);
+
+        // The file in the "most important directory" overrides all others of the same filename
+        if (!mBadNames.contains(fileName) && !mMap.contains(fileName))
         {
-            badNames.push_back(f->value("Name").toString()); //this is needed as std says all with the same name get removed by one entry with these flags too
-            delete f;
+            XdgDesktopFile * file = new XdgDesktopFile();
+            file->load(_dir + fileName);
+            if (file->isApplicable(mExcludeHidden))
+            {
+                mMap.insert(fileName, file);
+            }
+            else
+            {
+                mBadNames.insert(fileName);
+                delete file;
+            }
         }
     }
 }
@@ -94,15 +102,13 @@ void XdgAutoStart::addDirtoList(const QString & _dir)
 /**
  *@brief puts some output to qDebug()
  */
-
 void XdgAutoStart::debugAutostart()
 {
-    for (int i = 0; i < m_list.count(); i++)
+    foreach (QString file, mMap.keys())
     {
-        XdgDesktopFile * tmp = m_list.at(i);
+        XdgDesktopFile * tmp = mMap.value(file);
         qDebug() << tmp->value("Name").toString();
     }
-
 }
 
 
@@ -112,27 +118,9 @@ void XdgAutoStart::debugAutostart()
  */
 XdgAutoStart::~XdgAutoStart()
 {
-    foreach(XdgDesktopFile * f, m_list)
+    foreach(XdgDesktopFile * f, mMap)
         delete f;
-    m_list.clear();
-}
-
-
-/**
- * @brief does clean the list according to the XDG-Standards
- */
-void XdgAutoStart::cleanList()
-{
-    qDebug() << "XdgAutoStart: cleaning house! (" << badNames.count() << " bad Names )";
-    for (int i = 0; i < m_list.count(); i++)
-    {
-        XdgDesktopFile * tmp = m_list.at(i);
-        if (badNames.contains(tmp->value("Name").toString()))
-        {
-            delete m_list.takeAt(i);
-        }
-    }
-    qDebug() << "XdgAutoStart: after cleaning: " << m_list.count()<< " items left.";
+    mMap.clear();
 }
 
 
@@ -140,11 +128,32 @@ void XdgAutoStart::cleanList()
  * @brief constructor without parameters. XdgAutoStart will use its own XdgDirs!
  * Useful for using this class alone without a manager.
  */
-
-XdgAutoStart::XdgAutoStart()
+XdgAutoStart::XdgAutoStart(bool excludeHidden)
 {
+    mExcludeHidden = excludeHidden;
     qDebug() << "XdgAutoStart: initialising with on XdgDirs...";
     updateList();
+}
+
+
+/**
+ * @brief saves the specified file in the home autostart directory, modifying
+ * or overriding the original entry.
+ */
+bool XdgAutoStart::saveAutoStartFile(XdgDesktopFile* file)
+{
+    QString filePath = file->fileName();
+    QString fileName = QFileInfo(filePath).fileName();
+    if (!mMap.contains(fileName))
+    {
+        mMap.insert(fileName, file);
+    }
+    else if (mMap.value(fileName)->fileName() != filePath)
+    {
+        delete mMap.take(fileName);
+        mMap.insert(fileName, file);
+    }
+    return file->save(XdgDirs::configHome() + "/autostart/" + fileName);
 }
 
 
@@ -153,5 +162,13 @@ XdgAutoStart::XdgAutoStart()
  */
 QList< XdgDesktopFile* > XdgAutoStart::list()
 {
-    return m_list;
+    return mMap.values();
+}
+
+/**
+ * @brief returns a mapping of filenames to the Desktopfiles stored
+ */
+QMap< QString, XdgDesktopFile* > XdgAutoStart::map()
+{
+    return mMap;
 }
