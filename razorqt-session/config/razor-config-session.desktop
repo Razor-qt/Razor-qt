@@ -17,6 +17,11 @@ Name[hu]=Razor munkamenetbeállíó
 Comment[hu]=A Razor-Qt munkamenetmodul beállítása
 GenericName[hu]=Razor munkamenetbeállíó
 
+<<<<<<< HEAD
+Name[de]= Razor Sitzungs konfiguration
+Comment[de]=Konfiguriere die Razor-Qt Sitzungs Module
+GenericName[de]= Razor Sitzungs konfiguration
+=======
 Name[pl]=Ustawienia sesji Razor
 Comment[pl]=Ustawienia sesji Razor-Qt
 GenericName[pl]=Ustawienia sesji Razor
@@ -29,3 +34,4 @@ Name[sk]=Nastavenie relácie
 Comment[sk]=Nastavenie relácie prostredia Razor-Qt
 GenericName[sk]=Nastavenie relácie prostredia Razor
 
+>>>>>>> upstream/master
