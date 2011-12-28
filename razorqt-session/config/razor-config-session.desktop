@@ -25,3 +25,7 @@ GenericName[es]=Configuración de Sesiones Razor
 Name[hu]=Razor munkamenetbeállíó
 Comment[hu]=A Razor-Qt munkamenetmodul beállítása
 GenericName[hu]=Razor munkamenetbeállíó
+
+Name[de]= Razor Sitzungs konfiguration
+Comment[de]=Konfiguriere die Razor-Qt Sitzungs Module
+GenericName[de]= Razor Sitzungs konfiguration
