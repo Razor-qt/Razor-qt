@@ -6,7 +6,7 @@
     <message>
         <location filename="../configuredialog/configuredialog.ui" line="14"/>
         <source>Razor-runner Settings</source>
-        <translation>Razor啟動器設定</translation>
+        <translation>Razor快速執行設定</translation>
     </message>
     <message>
         <location filename="../configuredialog/configuredialog.ui" line="20"/>
@@ -59,7 +59,7 @@
     <message>
         <location filename="../dialog.cpp" line="91"/>
         <source>Configure razor-runner</source>
-        <translation>設置Razor啟動器</translation>
+        <translation>設置Razor快速執行</translation>
     </message>
     <message>
         <location filename="../dialog.cpp" line="296"/>
