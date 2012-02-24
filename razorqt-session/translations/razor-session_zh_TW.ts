@@ -135,7 +135,7 @@
     <message>
         <location filename="../config/sessionconfigwindow.ui" line="125"/>
         <source>Runner</source>
-        <translation>啟動器</translation>
+        <translation>快速執行</translation>
     </message>
     <message>
         <location filename="../config/sessionconfigwindow.ui" line="132"/>
