@@ -29,11 +29,56 @@
 #include "razorsettings.h"
 #include <qtxdg/xdgicon.h>
 
+#ifdef DEBUG
+#define COLOR_DEBUG "\033[32;1m"
+#define COLOR_WARN "\033[33;1m"
+#define COLOR_CRITICAL "\033[31;1m"
+#define COLOR_FATAL "\033[33;1m"
+#define COLOR_RESET "\033[0m"
 
+#define QAPP_NAME qApp ? qApp->objectName().toUtf8().constData() : ""
+
+#include <cstdio>
+#include <cstdlib>
+#include <QDateTime>
+/*! \biref Log qDebug input to file
+Used only in pure Debug builds.
+*/
+void dbgMessageOutput(QtMsgType type, const char *msg)
+ {
+    FILE *f;
+    f = fopen (razorConfigDir().toUtf8() + "/debug.log", "a+");
+    const char * dt = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz").toUtf8();
+    switch (type) {
+    case QtDebugMsg:
+        fprintf(f, "%s %s(%p) Debug: %s\n", dt, QAPP_NAME, qApp, msg);
+        fprintf(stderr, "%s %s %s(%p) Debug: %s%s\n", dt, COLOR_DEBUG, QAPP_NAME, qApp, msg, COLOR_RESET);
+        break;
+    case QtWarningMsg:
+        fprintf(f, "%s %s(%p) Warning: %s\n", dt, QAPP_NAME, qApp, msg);
+        fprintf(stderr, "%s %s %s(%p) Warning: %s%s\n", dt, COLOR_WARN, QAPP_NAME, qApp, msg, COLOR_RESET);
+        break;
+    case QtCriticalMsg:
+        fprintf(f, "%s %s(%p) Critical: %s\n", dt, QAPP_NAME, qApp, msg);
+        fprintf(stderr, "%s %s %s(%p) Critical: %s%s\n", dt, COLOR_CRITICAL, QAPP_NAME, qApp, msg, COLOR_RESET);
+        break;
+    case QtFatalMsg:
+        fprintf(f, "%s %s(%p) Fatal: %s\n", dt, QAPP_NAME, qApp, msg);
+        fprintf(stderr, "%s %s %s(%p) Fatal: %s%s\n", dt, COLOR_FATAL, QAPP_NAME, qApp, msg, COLOR_RESET);
+        fclose(f);
+        abort();
+    }
+    fclose(f);
+}
+#endif
 
 RazorApplication::RazorApplication(int &argc, char** argv, const QString &stylesheetKey)
     : QApplication(argc, argv)
 {
+#ifdef DEBUG
+    qInstallMsgHandler(dbgMessageOutput);
+#endif
+
     setStyle(new RazorQProxyStyle());
     XdgIcon::setThemeName(RazorSettings::globalSettings()->value("icon_theme").toString());
     setWindowIcon(QIcon(QString(SHARE_DIR) + "/graphics/razor_logo.png"));
