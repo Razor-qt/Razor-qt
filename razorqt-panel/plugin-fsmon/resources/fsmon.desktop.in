@@ -1,5 +1,5 @@
 [Desktop Entry]
 Type=Service
 ServiceTypes=RazorPanel/Plugin
-Name=FS Monitor
-Comment=Monitor FS usage
+Name=FileSystem Monitor
+Comment=Monitor FileSystem usage
