@@ -54,14 +54,33 @@ SessionConfigWindow::SessionConfigWindow()
     new QListWidgetItem(XdgIcon::fromTheme("preferences-desktop-filetype-association"), tr("Default Applications"), listWidget);
     new QListWidgetItem(XdgIcon::fromTheme("preferences-desktop-launch-feedback"), tr("Autostart"), listWidget);
     new QListWidgetItem(XdgIcon::fromTheme("preferences-system-session-services"), tr("Environment (Advanced)"), listWidget);
+	new QListWidgetItem(XdgIcon::fromTheme("preferences-desktop-keyboard.png"), tr("Keyboard Shortcuts"), listWidget);
     listWidget->setCurrentRow(0);
 
     m_settings = new RazorSettings("session", this);
+    m_shortcutSettings = new RazorSettings("globalaccel", this);
     m_cache = new RazorSettingsCache(m_settings);
     restoreSettings();
 
     // UI stuff
     connect(findWmButton, SIGNAL(clicked()), this, SLOT(findWmButton_clicked()));
+	//
+	connect ( shortcutTableWidget , SIGNAL (customContextMenuRequested(QPoint)) , SLOT(popupShortcutEditorMenu(QPoint)));
+
+	shortcutEditorMenu = new QMenu (this);
+    QAction *removeCurrentShortcut = new QAction ( tr("Remove") , this );
+    connect (removeCurrentShortcut , SIGNAL(triggered()) , SLOT(removeCurrentShortcut()));
+
+	QAction *resetShortcut = new QAction ( tr("Reset") , this );
+	connect (resetShortcut , SIGNAL(triggered()) , SLOT(resetShortcuts()));
+
+	QAction *addNewShortcut = new QAction ( tr("Add") , this );
+	connect (addNewShortcut , SIGNAL(triggered()) , SLOT(addNewShortcut()));
+
+	shortcutEditorMenu->addAction(addNewShortcut);
+    shortcutEditorMenu->addAction(removeCurrentShortcut);
+	shortcutEditorMenu->addSeparator();
+	shortcutEditorMenu->addAction(resetShortcut);
     //
     connect(terminalButton, SIGNAL(clicked()), this, SLOT(terminalButton_clicked()));
     connect(browserButton, SIGNAL(clicked()), this, SLOT(browserButton_clicked()));
@@ -107,6 +126,7 @@ void SessionConfigWindow::restoreSettings()
     modules["razor-runner"] = runnerCheckBox;
     modules["razor-appswitcher"] = appswitcherCheckBox;
     modules["razor-policykit-agent"] = policyKitCheckBox;
+    modules["razor-globalaccel"] = globalaccelCheckBox;
     
     m_settings->beginGroup("modules");
     foreach(QString i, modules.keys())
@@ -152,6 +172,34 @@ void SessionConfigWindow::restoreSettings()
         envTreeWidget->addTopLevelItem(item);
     }
     m_settings->endGroup();
+
+	///
+	foreach (const QString & shortcutGroup , m_shortcutSettings->childGroups())
+	{
+		m_shortcutSettings->beginGroup ( shortcutGroup );
+		const QString & command = m_shortcutSettings->value ("Exec").toString();
+		const QString & comment = m_shortcutSettings->value ("Comment").toString();
+		bool enabled = m_shortcutSettings->value ("Enabled").toBool();
+
+		QCheckBox *checkBox = new QCheckBox (this);
+		checkBox->setChecked (enabled);
+
+		RazorShortcutButton *pushButton = new RazorShortcutButton (this);
+		pushButton->setText ( shortcutGroup );
+
+		int row = shortcutTableWidget->rowCount ();
+		shortcutTableWidget->setRowCount (row + 1);
+
+		shortcutTableWidget->setCellWidget ( row , 0 , checkBox );
+		shortcutTableWidget->setItem ( row , 1 , new QTableWidgetItem ( comment ) );
+		shortcutTableWidget->setCellWidget ( row , 2 , pushButton );
+		shortcutTableWidget->setItem ( row , 3 , new QTableWidgetItem ( command ) );
+
+		m_shortcutSettings->endGroup ();
+	}
+
+	shortcutTableWidget->resizeColumnToContents (0);
+	shortcutTableWidget->resizeColumnToContents (1);
 }
 
 SessionConfigWindow::~SessionConfigWindow()
@@ -173,6 +221,7 @@ void SessionConfigWindow::closeEvent(QCloseEvent * event)
     m_settings->setValue("razor-runner", runnerCheckBox->isChecked());
     m_settings->setValue("razor-appswitcher", appswitcherCheckBox->isChecked());
     m_settings->setValue("razor-policykit-agent", policyKitCheckBox->isChecked());
+    m_settings->setValue("razor-globalaccel", globalaccelCheckBox->isChecked());
     m_settings->endGroup();
 
     
@@ -196,6 +245,24 @@ void SessionConfigWindow::closeEvent(QCloseEvent * event)
     if (!browserComboBox->currentText().isEmpty())
         m_settings->setValue("BROWSER", browserComboBox->currentText());
     m_settings->endGroup();
+
+	///
+	for ( int i = 0 ; i < shortcutTableWidget->rowCount() ; ++ i )
+	{
+		QCheckBox *checkBox = qobject_cast<QCheckBox*> (shortcutTableWidget->cellWidget(i , 0));
+		const QString & comment = shortcutTableWidget->item (i , 1)->text ();
+		RazorShortcutButton *button = qobject_cast<RazorShortcutButton*> (shortcutTableWidget->cellWidget(i , 2));
+		const QString & command = shortcutTableWidget->item (i , 3)->text ();
+
+		if ( comment.isEmpty() && command.isEmpty() )
+			continue;
+
+		m_shortcutSettings->beginGroup ( button->text() );
+		m_shortcutSettings->setValue ("Exec" , command);
+		m_shortcutSettings->setValue ("Enabled" , checkBox->isChecked ());
+		m_shortcutSettings->setValue ("Comment" , comment);
+		m_shortcutSettings->endGroup ();
+	}
     
     if (m_restart) {
         QMessageBox::information(this, tr("Session Restart Required"),
@@ -204,6 +271,42 @@ void SessionConfigWindow::closeEvent(QCloseEvent * event)
                                     )
                                 );
     }
+}
+
+void SessionConfigWindow::removeCurrentShortcut ()
+{
+	int row = shortcutTableWidget->currentRow();
+	if ( row > -1 )
+		shortcutTableWidget->removeRow(row);
+
+}
+
+void SessionConfigWindow::resetShortcuts ()
+{
+
+}
+
+void SessionConfigWindow::addNewShortcut ()
+{
+	QCheckBox *checkBox = new QCheckBox (this);
+	checkBox->setChecked (true);
+
+    RazorShortcutButton *pushButton = new RazorShortcutButton (this);
+	pushButton->setText ( "None" );
+
+	int row = shortcutTableWidget->rowCount ();
+	shortcutTableWidget->setRowCount (row + 1);
+
+	shortcutTableWidget->setCellWidget ( row , 0 , checkBox );
+	shortcutTableWidget->setItem ( row , 1 , new QTableWidgetItem ("") );
+	shortcutTableWidget->setCellWidget ( row , 2 , pushButton );
+	shortcutTableWidget->setItem ( row , 3 , new QTableWidgetItem ("") );
+}
+
+void SessionConfigWindow::popupShortcutEditorMenu (const QPoint & pos)
+{
+	Q_UNUSED (pos);
+	shortcutEditorMenu->exec (QCursor::pos());
 }
 
 void SessionConfigWindow::handleCfgComboBox(QComboBox * cb,

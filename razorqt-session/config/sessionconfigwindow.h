@@ -29,10 +29,13 @@
 #define SESSIONCONFIGWINDOW_H
 
 #include <QStringListModel>
+#include <QtGui/QCheckBox>
+#include <QtGui/QMenu>
 #include <QtGui/QStandardItemModel>
 
 #include <qtxdg/xdgautostart.h>
 
+#include "../../libraries/razorqt/razorshortcutbutton.h"
 #include "ui_sessionconfigwindow.h"
 #include "autostartmodel.h"
 
@@ -52,11 +55,13 @@ public:
 private:
     // RazorSettings are used as plain QSettings here because tha session cannot
     // reload cfg on the fly - it requires restart (ENV, autostart...)
-    RazorSettings *m_settings;
+    RazorSettings *m_settings , *m_shortcutSettings;
     RazorSettingsCache *m_cache;
     AutoStartItemModel *mXdgAutoStartModel;
     // display restart warning
     bool m_restart;
+	// context menu for shortcuteditor
+	QMenu *shortcutEditorMenu;
 
     void handleCfgComboBox(QComboBox * cb,
                            const QStringList &availableValues,
@@ -72,6 +77,11 @@ private:
 private slots:
     //
     void findWmButton_clicked();
+	//
+	void removeCurrentShortcut ();
+	void resetShortcuts ();
+	void addNewShortcut ();
+	void popupShortcutEditorMenu (const QPoint & pos);
     //
     void terminalButton_clicked();
     void browserButton_clicked();
