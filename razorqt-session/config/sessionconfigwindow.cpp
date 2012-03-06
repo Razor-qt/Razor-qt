@@ -7,6 +7,7 @@
  * Copyright: 2010-2011 Razor team
  * Authors:
  *   Petr Vanek <petr@scribus.info>
+ *   Aaron Lewis <the.warl0ck.1989@gmail.com>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
@@ -187,6 +188,9 @@ void SessionConfigWindow::restoreSettings()
 		RazorShortcutButton *pushButton = new RazorShortcutButton (this);
 		pushButton->setText ( shortcutGroup );
 
+		existingShortcuts.insert ( shortcutGroup , pushButton );
+		connect (pushButton , SIGNAL( keySequenceChanged (QString) ) , this , SLOT (shortcutChanged ( QString ) ) );
+
 		int row = shortcutTableWidget->rowCount ();
 		shortcutTableWidget->setRowCount (row + 1);
 
@@ -247,6 +251,7 @@ void SessionConfigWindow::closeEvent(QCloseEvent * event)
     m_settings->endGroup();
 
 	///
+	m_shortcutSettings->clear ();
 	for ( int i = 0 ; i < shortcutTableWidget->rowCount() ; ++ i )
 	{
 		QCheckBox *checkBox = qobject_cast<QCheckBox*> (shortcutTableWidget->cellWidget(i , 0));
@@ -273,11 +278,48 @@ void SessionConfigWindow::closeEvent(QCloseEvent * event)
     }
 }
 
+void SessionConfigWindow::shortcutChanged (const QString & keySequence)
+{
+	if ( keySequence == "None" )
+	{
+		return;
+	}
+
+	// already exists
+	if ( existingShortcuts.contains (keySequence) )
+	{
+		RazorShortcutButton *button = qobject_cast<RazorShortcutButton*> (sender());
+		// clear current bindings
+		if ( QMessageBox::information (this , tr ("Key combination already in use") , tr("Replace old one ?") , 
+					QMessageBox::Yes , QMessageBox::No ) == QMessageBox::Yes )
+		{
+			existingShortcuts.value (keySequence)->setText ("None");
+			existingShortcuts.remove (keySequence);
+		}
+		// remove old bindings
+		else
+			button->setText ("None");
+	}
+}
+
 void SessionConfigWindow::removeCurrentShortcut ()
 {
 	int row = shortcutTableWidget->currentRow();
 	if ( row > -1 )
+	{
+
+		RazorShortcutButton *button = qobject_cast<RazorShortcutButton*> (shortcutTableWidget->cellWidget(row , 2));
+		const QString & keySequence = button->text ();
+
+		if ( keySequence != "None" )
+		{
+			existingShortcuts.remove ( keySequence );
+			disconnect (button , SIGNAL( keySequenceChanged (QString) ) , this , SLOT (shortcutChanged ( QString ) ) );
+		}
+
 		shortcutTableWidget->removeRow(row);
+
+	}
 
 }
 
@@ -293,6 +335,7 @@ void SessionConfigWindow::addNewShortcut ()
 
     RazorShortcutButton *pushButton = new RazorShortcutButton (this);
 	pushButton->setText ( "None" );
+	connect (pushButton , SIGNAL( keySequenceChanged (QString) ) , this , SLOT (shortcutChanged ( QString ) ) );
 
 	int row = shortcutTableWidget->rowCount ();
 	shortcutTableWidget->setRowCount (row + 1);
