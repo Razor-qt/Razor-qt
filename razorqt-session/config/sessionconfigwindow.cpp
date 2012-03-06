@@ -175,35 +175,7 @@ void SessionConfigWindow::restoreSettings()
     m_settings->endGroup();
 
 	///
-	foreach (const QString & shortcutGroup , m_shortcutSettings->childGroups())
-	{
-		m_shortcutSettings->beginGroup ( shortcutGroup );
-		const QString & command = m_shortcutSettings->value ("Exec").toString();
-		const QString & comment = m_shortcutSettings->value ("Comment").toString();
-		bool enabled = m_shortcutSettings->value ("Enabled").toBool();
-
-		QCheckBox *checkBox = new QCheckBox (this);
-		checkBox->setChecked (enabled);
-
-		RazorShortcutButton *pushButton = new RazorShortcutButton (this);
-		pushButton->setText ( shortcutGroup );
-
-		existingShortcuts.insert ( shortcutGroup , pushButton );
-		connect (pushButton , SIGNAL( keySequenceChanged (QString) ) , this , SLOT (shortcutChanged ( QString ) ) );
-
-		int row = shortcutTableWidget->rowCount ();
-		shortcutTableWidget->setRowCount (row + 1);
-
-		shortcutTableWidget->setCellWidget ( row , 0 , checkBox );
-		shortcutTableWidget->setItem ( row , 1 , new QTableWidgetItem ( comment ) );
-		shortcutTableWidget->setCellWidget ( row , 2 , pushButton );
-		shortcutTableWidget->setItem ( row , 3 , new QTableWidgetItem ( command ) );
-
-		m_shortcutSettings->endGroup ();
-	}
-
-	shortcutTableWidget->resizeColumnToContents (0);
-	shortcutTableWidget->resizeColumnToContents (1);
+	resetShortcuts();
 }
 
 SessionConfigWindow::~SessionConfigWindow()
@@ -325,7 +297,37 @@ void SessionConfigWindow::removeCurrentShortcut ()
 
 void SessionConfigWindow::resetShortcuts ()
 {
+	shortcutTableWidget->setRowCount (0);
 
+	foreach (const QString & shortcutGroup , m_shortcutSettings->childGroups())
+	{
+		m_shortcutSettings->beginGroup ( shortcutGroup );
+		const QString & command = m_shortcutSettings->value ("Exec").toString();
+		const QString & comment = m_shortcutSettings->value ("Comment").toString();
+		bool enabled = m_shortcutSettings->value ("Enabled").toBool();
+
+		QCheckBox *checkBox = new QCheckBox (this);
+		checkBox->setChecked (enabled);
+
+		RazorShortcutButton *pushButton = new RazorShortcutButton (this);
+		pushButton->setText ( shortcutGroup );
+
+		existingShortcuts.insert ( shortcutGroup , pushButton );
+		connect (pushButton , SIGNAL( keySequenceChanged (QString) ) , this , SLOT (shortcutChanged ( QString ) ) );
+
+		int row = shortcutTableWidget->rowCount ();
+		shortcutTableWidget->setRowCount (row + 1);
+
+		shortcutTableWidget->setCellWidget ( row , 0 , checkBox );
+		shortcutTableWidget->setItem ( row , 1 , new QTableWidgetItem ( comment ) );
+		shortcutTableWidget->setCellWidget ( row , 2 , pushButton );
+		shortcutTableWidget->setItem ( row , 3 , new QTableWidgetItem ( command ) );
+
+		m_shortcutSettings->endGroup ();
+	}
+
+	shortcutTableWidget->resizeColumnToContents (0);
+	shortcutTableWidget->resizeColumnToContents (1);
 }
 
 void SessionConfigWindow::addNewShortcut ()
