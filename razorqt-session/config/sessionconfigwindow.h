@@ -7,6 +7,7 @@
  * Copyright: 2010-2011 Razor team
  * Authors:
  *   Petr Vanek <petr@scribus.info>
+ *   Aaron Lewis <the.warl0ck.1989@gmail.com>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
@@ -29,10 +30,15 @@
 #define SESSIONCONFIGWINDOW_H
 
 #include <QStringListModel>
+#include <QtGui/QCheckBox>
+#include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
+#include <QMap>
 
 #include <qtxdg/xdgautostart.h>
 
+#include "../../libraries/razorqt/razorshortcutbutton.h"
 #include "ui_sessionconfigwindow.h"
 #include "autostartmodel.h"
 
@@ -52,11 +58,15 @@ public:
 private:
     // RazorSettings are used as plain QSettings here because tha session cannot
     // reload cfg on the fly - it requires restart (ENV, autostart...)
-    RazorSettings *m_settings;
+    RazorSettings *m_settings , *m_shortcutSettings;
     RazorSettingsCache *m_cache;
     AutoStartItemModel *mXdgAutoStartModel;
     // display restart warning
     bool m_restart;
+	// context menu for shortcuteditor
+	QMenu *shortcutEditorMenu;
+	// mapping between key combination and the button
+	QMap<QString,RazorShortcutButton*> existingShortcuts;
 
     void handleCfgComboBox(QComboBox * cb,
                            const QStringList &availableValues,
@@ -72,6 +82,12 @@ private:
 private slots:
     //
     void findWmButton_clicked();
+	//
+	void shortcutChanged (const QString & text);
+	void removeCurrentShortcut ();
+	void resetShortcuts ();
+	void addNewShortcut ();
+	void popupShortcutEditorMenu (const QPoint & pos);
     //
     void terminalButton_clicked();
     void browserButton_clicked();

@@ -57,6 +57,7 @@ message(STATUS "")
 
 # main build subdirs
 add_subdirectory( libraries )
+add_subdirectory( razorqt-globalaccel )
 add_subdirectory( razorqt-session )
 add_subdirectory( razorqt-panel )
 add_subdirectory( razorqt-desktop )
