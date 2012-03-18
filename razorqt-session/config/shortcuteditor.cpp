@@ -246,16 +246,21 @@ void ShortcutEditor::removeCurrent()
     {
         /// removing a group , careful
         if ( ! item->parent() )
-        {
-            if ( D_GROUP (item->text(0)) )
-                return;
-        }
-        else if ( D_SINGLE (item->text(0)) )
-            return;
+		{
+			if ( D_GROUP (item->text(0)) )
+				return;
+			
+			/// kill whole group
+			const QModelIndex & idx = mTreeWidget->currentIndex();
+			mTreeWidget->model()->removeRow(idx.row());
 
-        const QModelIndex & idx = mTreeWidget->currentIndex();
-        mTreeWidget->model()->removeRow(idx.row());
-    }
+		}
+		else if ( D_SINGLE (item->text(0)) )
+			return;
+
+		/// remove single child
+		item->parent()->removeChild( item );
+	}
 }
 
 ShortcutEditor::~ShortcutEditor()
@@ -280,8 +285,6 @@ ShortcutEditor::~ShortcutEditor()
 			if ( shortcut.trimmed().isEmpty() && cmd.trimmed().isEmpty() )
 				continue;
 
-			qDebug() << "Saving: " << groupName << descr << cmd;
-
 			mSettings->beginGroup (shortcut);
 
 			mSettings->setValue ("Exec" , cmd);
@@ -290,9 +293,6 @@ ShortcutEditor::~ShortcutEditor()
 			mSettings->setValue ("Enabled" , enabled);
 
 			mSettings->endGroup ();
-
-            qDebug() << "[ " << groupName << " ] " << enabled << descr << shortcut << cmd;
-        }
     }
 
 	delete mSettings;
