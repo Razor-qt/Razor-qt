@@ -293,6 +293,7 @@ ShortcutEditor::~ShortcutEditor()
 			mSettings->setValue ("Enabled" , enabled);
 
 			mSettings->endGroup ();
+		}
     }
 
 	delete mSettings;
