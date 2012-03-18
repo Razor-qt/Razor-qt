@@ -54,6 +54,7 @@ SessionConfigWindow::SessionConfigWindow()
     new QListWidgetItem(XdgIcon::fromTheme("preferences-desktop-filetype-association"), tr("Default Applications"), listWidget);
     new QListWidgetItem(XdgIcon::fromTheme("preferences-desktop-launch-feedback"), tr("Autostart"), listWidget);
     new QListWidgetItem(XdgIcon::fromTheme("preferences-system-session-services"), tr("Environment (Advanced)"), listWidget);
+	new QListWidgetItem(XdgIcon::fromTheme("preferences-desktop-keyboard.png"), tr("Keyboard Shortcuts"), listWidget);
     listWidget->setCurrentRow(0);
 
     m_settings = new RazorSettings("session", this);
@@ -107,6 +108,7 @@ void SessionConfigWindow::restoreSettings()
     modules["razor-runner"] = runnerCheckBox;
     modules["razor-appswitcher"] = appswitcherCheckBox;
     modules["razor-policykit-agent"] = policyKitCheckBox;
+    modules["razor-globalaccel"] = globalaccelCheckBox;
     
     m_settings->beginGroup("modules");
     foreach(QString i, modules.keys())
@@ -173,6 +175,7 @@ void SessionConfigWindow::closeEvent(QCloseEvent * event)
     m_settings->setValue("razor-runner", runnerCheckBox->isChecked());
     m_settings->setValue("razor-appswitcher", appswitcherCheckBox->isChecked());
     m_settings->setValue("razor-policykit-agent", policyKitCheckBox->isChecked());
+    m_settings->setValue("razor-globalaccel", globalaccelCheckBox->isChecked());
     m_settings->endGroup();
 
     
