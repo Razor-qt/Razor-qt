@@ -48,64 +48,64 @@
 ///
 class ShortCutDelegate : public QItemDelegate
 {
-    Q_OBJECT
+	Q_OBJECT
 
-public:
-    ShortCutDelegate(QObject *parent = 0) : QItemDelegate(parent) {}
+	public:
+		ShortCutDelegate(QObject *parent = 0) : QItemDelegate(parent) {}
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const;
+		QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+				const QModelIndex &index) const;
 
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model,
-                      const QModelIndex &index) const;
+		void setEditorData(QWidget *editor, const QModelIndex &index) const;
+		void setModelData(QWidget *editor, QAbstractItemModel *model,
+				const QModelIndex &index) const;
 
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+		QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    void updateEditorGeometry(QWidget *editor,
-        const QStyleOptionViewItem &option, const QModelIndex &index) const;
+		void updateEditorGeometry(QWidget *editor,
+				const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-private:
+	private:
 
-private slots:
+		private slots:
 
 };
 ///
 
 class ShortcutEditor : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
-public:
-    ShortcutEditor(QWidget *parent = 0);
-    ~ShortcutEditor();
+	public:
+		ShortcutEditor(QWidget *parent = 0);
+		~ShortcutEditor();
 
-private:
-    QTreeWidget *mTreeWidget;
-    QMenu *mMenu;
+	private:
+		QTreeWidget *mTreeWidget;
+		QMenu *mMenu;
 
-    /// mapping between key sequence and the item holding it
-    QMap<QString,QTreeWidgetItem*> mapping;
-    /// load shortcut settings (auto filter duplicate)
-    void loadSettings ();
+		/// mapping between key sequence and the item holding it
+		QMap<QString,QTreeWidgetItem*> mapping;
+		/// load shortcut settings (auto filter duplicate)
+		void loadSettings ();
 
-private slots:
-    /// add new group
-    void addGroup ();
-    /// add new shortcut
-    void addEmpty ();
-    /// remove current shortcut
-    void removeCurrent ();
-	/// reset shortcuts
-	void resetAll ();
+		private slots:
+			/// add new group
+			void addGroup ();
+		/// add new shortcut
+		void addEmpty ();
+		/// remove current shortcut
+		void removeCurrent ();
+		/// reset shortcuts
+		void resetAll ();
 
-    /// show context menu
-    void showMenu ();
+		/// show context menu
+		void showMenu ();
 
-    /// shortcut changed , remove old one
-    void shortcutChanged (QTreeWidgetItem *item , int col);
+		/// shortcut changed , remove old one
+		void shortcutChanged (QTreeWidgetItem *item , int col);
 
-protected:
+	protected:
 
 };
 
