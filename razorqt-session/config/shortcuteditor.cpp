@@ -254,6 +254,8 @@ void ShortcutEditor::removeCurrent()
 			const QModelIndex & idx = mTreeWidget->currentIndex();
 			mTreeWidget->model()->removeRow(idx.row());
 
+			return;
+
 		}
 		else if ( D_SINGLE (item->text(0)) )
 			return;
