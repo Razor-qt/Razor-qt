@@ -182,12 +182,17 @@ void ShortcutEditor::shortcutChanged(QTreeWidgetItem *item , int col)
 	{
 		if ( mapping.contains(sc) )
 		{
+			QTreeWidgetItem *old_item = mapping.value (sc);
+			if ( item == old_item )
+			{
+				mapping.insert (sc , item);
+				return;
+			}
+
 			/// conflict with existing , remove old one
 			if ( R_EXISTING(sc) )
 			{
 				mapping.value(sc)->setText(1 , "None");
-				mapping.remove(sc);
-
 				mapping.insert(sc , item);
 			}
 			/// cancel
@@ -244,10 +249,12 @@ void ShortcutEditor::removeCurrent()
 
 	if ( item )
 	{
+		const QString & text = item->text(0);
+
 		/// removing a group , careful
 		if ( ! item->parent() )
 		{
-			if ( D_GROUP (item->text(0)) )
+			if ( D_GROUP (text) )
 				return;
 
 			/// kill whole group
@@ -257,9 +264,11 @@ void ShortcutEditor::removeCurrent()
 			return;
 
 		}
-		else if ( D_SINGLE (item->text(0)) )
+		else if ( D_SINGLE (text) )
 			return;
 
+		/// remove shortcut mapping
+		mapping.remove (text);
 		/// remove single child
 		item->parent()->removeChild( item );
 	}
