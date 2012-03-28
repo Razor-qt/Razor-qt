@@ -214,6 +214,12 @@ void ShortcutEditor::loadSettings()
 		mSettings->endGroup();
 	}
 
+	if ( mTreeWidget->topLevelItemCount() == 0 )
+	{
+		QTreeWidgetItem *parentItem = new QTreeWidgetItem (QStringList() << "Default Group");
+		mTreeWidget->insertTopLevelItem(0 , parentItem);
+	}
+
 	mTreeWidget->expandAll();
 	delete mSettings;
 }
@@ -278,6 +284,9 @@ void ShortcutEditor::addEmpty()
 	item->setCheckState(0 , Qt::Checked);
 
 	QTreeWidgetItem *currentItem = mTreeWidget->currentItem();
+	if ( ! currentItem && mTreeWidget->topLevelItemCount() > 0 )
+		currentItem = mTreeWidget->topLevelItem(0);
+
 	if ( currentItem )
 	{
 		if ( ! currentItem->parent() )
