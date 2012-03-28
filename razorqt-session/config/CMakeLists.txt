@@ -8,6 +8,7 @@ set ( razor-sessioncfg_HDRS
     sessionconfigwindow.h
     autostartmodel.h
     autostartedit.h
+	shortcuteditor.h
 	)
 
 set ( razor-sessioncfg_SRCS
@@ -16,6 +17,7 @@ set ( razor-sessioncfg_SRCS
     autostartmodel.cpp
     autostartedit.cpp
     ../src/windowmanager.cpp
+	shortcuteditor.cpp
 	)
 
 QT4_WRAP_UI(razor-sessioncfg_UIS
