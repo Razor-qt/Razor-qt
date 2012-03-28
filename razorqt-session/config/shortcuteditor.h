@@ -37,6 +37,10 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QCursor>
 #include <QtGui/QTreeWidgetItem>
+#include <QtGui/QFileDialog>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
 #include <QtGui/QMouseEvent>
 #include <QSettings>
 #include <QAction>
@@ -45,6 +49,49 @@
 #include <razorqt/razorsettings.h>
 
 #include <QDebug>
+class CommandFinder : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit CommandFinder(QWidget *parent = 0);
+
+    QString text() { return m_lineEdit->text(); }
+    void setText(const QString & txt) { m_lineEdit->setText(txt); }
+
+private slots:
+    void setCommand ();
+
+private:
+    QLineEdit *m_lineEdit;
+    QPushButton *m_button;
+};
+
+///
+class CommandFinderDelegate : public QItemDelegate
+{
+    Q_OBJECT
+
+public:
+    explicit CommandFinderDelegate(QObject *parent = 0) : QItemDelegate(parent) {}
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
+
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+private:
+
+private slots:
+
+};
 ///
 class ShortCutDelegate : public QItemDelegate
 {

@@ -34,6 +34,58 @@
 #define R_EXISTING(q) (QMessageBox::question(NULL , tr("Question") , tr("Binding for %1 already exists. Replace old one ?").arg (q) , QMessageBox::Yes , QMessageBox::No) == QMessageBox::Yes)
 
 ///
+CommandFinder::CommandFinder (QWidget *parent):
+    QWidget (parent),
+    m_lineEdit (new QLineEdit (this)),
+    m_button (new QPushButton (tr("..") , this))
+{
+    QHBoxLayout *layout = new QHBoxLayout (this);
+    layout->addWidget(m_lineEdit);
+    layout->addWidget(m_button);
+
+    connect (m_button , SIGNAL(clicked()) , SLOT(setCommand()));
+}
+
+void CommandFinder::setCommand ()
+{
+    const QString & cmd = QFileDialog::getOpenFileName(this , tr("Find a command"));
+    if ( ! cmd.isEmpty() )
+        m_lineEdit->setText(cmd);
+}
+
+///
+QWidget *CommandFinderDelegate::createEditor(QWidget *parent,
+                                        const QStyleOptionViewItem &/* option */,
+                                        const QModelIndex &/* index */) const
+{
+    return new CommandFinder(parent);
+}
+
+void CommandFinderDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+                                    const QModelIndex &index) const
+{
+    CommandFinder *cf = static_cast<CommandFinder*>(editor);
+    model->setData(index, cf->text(), Qt::EditRole);
+}
+
+void CommandFinderDelegate::updateEditorGeometry(QWidget *editor,
+                                            const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+{
+    editor->setGeometry(option.rect);
+}
+
+void CommandFinderDelegate::setEditorData(QWidget *editor,
+                                     const QModelIndex &index) const
+{
+    CommandFinder *spinBox = static_cast<CommandFinder*>(editor);
+    spinBox->setText(index.model()->data(index, Qt::EditRole).toString());
+}
+
+QSize CommandFinderDelegate::sizeHint(const QStyleOptionViewItem &/*option*/, const QModelIndex &/*index*/) const
+{
+	return QSize ( 30 , 25 );
+}
+///
 QWidget *ShortCutDelegate::createEditor(QWidget *parent,
 		const QStyleOptionViewItem &/* option */,
 		const QModelIndex &/* index */) const
@@ -103,6 +155,7 @@ QSize ShortCutDelegate::sizeHint(const QStyleOptionViewItem &/*option*/, const Q
 	mTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	mTreeWidget->setHeaderLabels(QStringList() << tr("Action") << tr("Shortcut") << tr("Command"));
 	mTreeWidget->setItemDelegateForColumn (1 , new ShortCutDelegate(this));
+   mTreeWidget->setItemDelegateForColumn (2 , new CommandFinderDelegate(this));
 
 	connect (mTreeWidget , SIGNAL(customContextMenuRequested(QPoint)) , SLOT(showMenu()));
 	connect (mTreeWidget , SIGNAL(itemChanged(QTreeWidgetItem*,int))

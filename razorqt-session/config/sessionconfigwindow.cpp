@@ -62,6 +62,11 @@ SessionConfigWindow::SessionConfigWindow()
     restoreSettings();
 
     // UI stuff
+	connect (addNewBtn , SIGNAL(clicked()) , shortcutTableWidget , SLOT(addEmpty()));
+	connect (removeSelectedBtn, SIGNAL(clicked()) , shortcutTableWidget , SLOT(removeCurrent()));
+	connect (addGroupBtn, SIGNAL(clicked()) , shortcutTableWidget , SLOT(addGroup()));
+	connect (resetSCBtn, SIGNAL(clicked()) , shortcutTableWidget , SLOT(resetAll()));
+	//
     connect(findWmButton, SIGNAL(clicked()), this, SLOT(findWmButton_clicked()));
     //
     connect(terminalButton, SIGNAL(clicked()), this, SLOT(terminalButton_clicked()));
