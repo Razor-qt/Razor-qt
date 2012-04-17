@@ -5,8 +5,8 @@ Exec=razor-config-desktop
 Terminal=false
 Categories=Settings;DesktopSettings;Qt;X-RAZOR;
 Icon=preferences-desktop
-Name=Razor Desktop Configurator
+Name=Desktop
 Comment=Configure Razor-Qt desktop module
-GenericName=Razor Desktop Configurator
+GenericName=Desktop
 
 #TRANSLATIONS_DIR=translations
