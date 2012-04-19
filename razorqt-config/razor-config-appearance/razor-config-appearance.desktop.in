@@ -6,8 +6,8 @@ Exec=razor-config-appearance
 Terminal=false
 Categories=Settings;DesktopSettings;Qt;X-RAZOR;
 Icon=preferences-desktop-theme
-Name=Razor Appearance Configuration
+Name=Appearance
 Comment=Configure appearance of Razor desktop
-GenericName=Razor Appearance Configuration
+GenericName=Appearance
 
 #TRANSLATIONS_DIR=translations

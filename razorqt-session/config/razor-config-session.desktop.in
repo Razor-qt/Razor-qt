@@ -5,8 +5,8 @@ Exec=razor-config-session
 Terminal=false
 Categories=Settings;DesktopSettings;Qt;X-RAZOR;
 Icon=preferences-system-session-services
-Name=Razor Session Configurator
+Name=Session
 Comment=Configure Razor-Qt session module
-GenericName=Razor Session Configurator
+GenericName=Session
 
 #TRANSLATIONS_DIR=translations

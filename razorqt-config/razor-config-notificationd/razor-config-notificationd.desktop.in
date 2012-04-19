@@ -6,7 +6,7 @@ Exec=razor-config-notificationd
 Terminal=false
 Categories=Settings;DesktopSettings;Qt;X-RAZOR;
 Icon=preferences-desktop-theme
-Name=Razor Freedesktop Notifications Configuration
+Name=Notifications
 Comment=Configure freedesktop notifications in Razor desktop
 GenericName=Razor Freedesktop Notifications Configuration
 
