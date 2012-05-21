@@ -4,9 +4,9 @@
  * Razor - a lightweight, Qt based, desktop toolset
  * http://razor-qt.org
  *
- * Copyright: 2011 Razor team
+ * Copyright: 2010-2012 Razor team
  * Authors:
- *   Maciej Płaza <plaza.maciej@gmail.com>
+ *   Alexey Nosov <nay@a-mego.ru>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
@@ -25,44 +25,22 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
+#ifndef RAZORMAINMENUSPINBOX_H
+#define RAZORMAINMENUSPINBOX_H
 
-#ifndef RAZORMAINMENUCONFIGURATION_H
-#define RAZORMAINMENUCONFIGURATION_H
+#include <QSpinBox>
 
-#include <razorqt/razorsettings.h>
-#include <QDialog>
-
-class QSettings;
-class QAbstractButton;
-
-namespace Ui {
-    class RazorMainMenuConfiguration;
-}
-
-class RazorMainMenuConfiguration : public QDialog
-{
-    Q_OBJECT
+class RazorMainMenuSpinBox : public QSpinBox {
+	Q_OBJECT
 
 public:
-    explicit RazorMainMenuConfiguration(QSettings &settings, QWidget *parent = 0);
-    ~RazorMainMenuConfiguration();
+	RazorMainMenuSpinBox(QWidget *parent = 0);
 
 protected:
-	void closeEvent(QCloseEvent *e);
+	void focusOutEvent(QFocusEvent *e);
 
-private:
-    Ui::RazorMainMenuConfiguration *ui;
-    QSettings &mSettings;
-    RazorSettingsCache mOldSettings;
-
-private slots:
-    /*
-      Saves settings in conf file.
-    */
-	void saveSettings();
-    void loadSettings();
-	void onResetClick();
-    void chooseMenuFile();
+signals:
+	void focusOutSignal();
 };
 
-#endif // RAZORMAINMENUCONFIGURATION_H
+#endif // RAZORMAINMENUCONFIGURATIONSPINBOX_H
