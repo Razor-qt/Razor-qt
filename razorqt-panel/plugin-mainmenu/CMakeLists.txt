@@ -7,18 +7,21 @@ set(HEADERS
     razormainmenu.h
     menustyle.h
     razormainmenuconfiguration.h
+	razormainmenuspinbox.h
 )
 
 set(SOURCES
     razormainmenu.cpp
     menustyle.cpp
     razormainmenuconfiguration.cpp
+	razormainmenuspinbox.cpp
 )
 
 set(MOCS
     razormainmenu.h
     menustyle.h
     razormainmenuconfiguration.h
+	razormainmenuspinbox.h
 )
 
 set(UIS
@@ -32,6 +35,8 @@ set(LIBRARIES
 
 set(QT_USE_QTXML 1)
 set(QT_USE_QTDBUS 1)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 #*******************************************
 include ("../BuildPlugin.cmake")
