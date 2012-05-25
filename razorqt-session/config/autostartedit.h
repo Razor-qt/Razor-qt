@@ -27,8 +27,6 @@
 
 #include <QtGui/QDialog>
 
-#include <qtxdg/xdgdesktopfile.h>
-
 namespace Ui {
 class AutoStartEdit;
 }
@@ -38,10 +36,11 @@ class AutoStartEdit : public QDialog
     Q_OBJECT
 
 public:
-    explicit AutoStartEdit(QWidget *parent = 0);
+    explicit AutoStartEdit(QString name, QString command, bool needTray, QWidget* parent = 0);
     ~AutoStartEdit();
-    XdgDesktopFile* createXdgFile();
-    bool editXdgFile(XdgDesktopFile *file);
+    QString name();
+    QString command();
+    bool needTray();
 
 private slots:
     void browse();

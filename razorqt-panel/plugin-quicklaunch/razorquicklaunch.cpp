@@ -48,24 +48,17 @@
 
 EXPORT_RAZOR_PANEL_PLUGIN_CPP(RazorQuickLaunch)
 
-namespace
-{
-    static const unsigned int g_scNumberOfRows = 2 ;
-}
-
 
 RazorQuickLaunch::RazorQuickLaunch(const RazorPanelPluginStartInfo* startInfo, QWidget* parent)
     : RazorPanelPlugin(startInfo, parent),
-      m_maxIndex(0),
-      m_currentRow(0),
-      m_currentColumn(0)
+      m_maxIndex(0)
 {
     setObjectName("QuickLaunch");
     setAcceptDrops(true);
-       
-    m_layout = new QuickLaunchLayout(this);
-    m_layout->setAlignment(Qt::AlignCenter);
+
     delete layout();
+    m_layout = new QuickLaunchLayout(this, panel());
+    m_layout->setAlignment(Qt::AlignCenter);
     setLayout(m_layout);
 
     QSettings *s = &settings();
@@ -129,13 +122,7 @@ int RazorQuickLaunch::countOfButtons() const
 void RazorQuickLaunch::addButton(QuickLaunchAction* action)
 {
     QuickLaunchButton* btn = new QuickLaunchButton(m_maxIndex, action, this);
-    m_layout->addWidget(btn,m_currentRow,m_currentColumn++);
-    if ( m_currentColumn == g_scNumberOfRows)
-    {
-        m_currentColumn = 0 ;
-        m_currentRow++;
-    }
-
+    m_layout->addWidget(btn);
     m_buttons[m_maxIndex] = btn;
     
     connect(btn, SIGNAL(switchButtons(int,int)), this, SLOT(switchButtons(int,int)));
@@ -164,9 +151,16 @@ void RazorQuickLaunch::dragEnterEvent(QDragEnterEvent *e)
 void RazorQuickLaunch::dropEvent(QDropEvent *e)
 {
     const QMimeData *mime = e->mimeData();
+    // duplicates storage: [quicklaunch] issue dragging from qtfm, #252
+    QList<QUrl> duplicates;
     // urls from mainmenu
     foreach (QUrl url, mime->urls())
     {
+	if (duplicates.contains(url))
+            continue;
+	else
+	    duplicates << url;
+
         QString fileName(url.toLocalFile());
         XdgDesktopFile * xdg = XdgDesktopFileCache::getFile(fileName);
         QFileInfo fi(fileName);

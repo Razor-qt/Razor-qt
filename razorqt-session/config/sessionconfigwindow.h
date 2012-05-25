@@ -28,64 +28,36 @@
 #ifndef SESSIONCONFIGWINDOW_H
 #define SESSIONCONFIGWINDOW_H
 
-#include <QStringListModel>
-#include <QtGui/QStandardItemModel>
-
-#include <qtxdg/xdgautostart.h>
-
-#include "ui_sessionconfigwindow.h"
-#include "autostartmodel.h"
-
-class RazorSettings;
-class RazorSettingsCache;
-class QStringListModel;
+#include <QtGui/QComboBox>
+#include <razorqt/razorconfigdialog.h>
 
 
-class SessionConfigWindow : public QMainWindow, public Ui::SessionConfigWindow
+class SessionConfigWindow : public RazorConfigDialog
 {
     Q_OBJECT
     
 public:
     SessionConfigWindow();
     ~SessionConfigWindow();
-    
-private:
-    // RazorSettings are used as plain QSettings here because tha session cannot
-    // reload cfg on the fly - it requires restart (ENV, autostart...)
-    RazorSettings *m_settings;
-    RazorSettingsCache *m_cache;
-    AutoStartItemModel *mXdgAutoStartModel;
-    // display restart warning
-    bool m_restart;
 
-    void handleCfgComboBox(QComboBox * cb,
+    static void handleCfgComboBox(QComboBox * cb,
                            const QStringList &availableValues,
                            const QString &value
                           );
 
-    void updateCfgComboBox(QComboBox * cb, const QString &prompt);
+    static void updateCfgComboBox(QComboBox * cb, const QString &prompt);
 
     void closeEvent(QCloseEvent * event);
 
-    void restoreSettings();
-
-private slots:
-    //
-    void findWmButton_clicked();
-    //
-    void terminalButton_clicked();
-    void browserButton_clicked();
-    //
-    void autoStartAddButton_clicked();
-    void autoStartEditButton_clicked();
-    void autoStartDeleteButton_clicked();
-    //
-    void envAddButton_clicked();
-    void envDeleteButton_clicked();
-    //
+public slots:
     void setRestart();
 
-    void dialogButtonsAction(QAbstractButton *btn);
+private:
+    // display restart warning
+    bool m_restart;
+
+private slots:
+    void clearRestart();
 };
 
 #endif

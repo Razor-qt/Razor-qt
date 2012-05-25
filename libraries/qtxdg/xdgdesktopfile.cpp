@@ -77,7 +77,6 @@ QString &doEscape(QString& str, const QHash<QChar,QChar> &repl)
 QString &escape(QString& str)
 {
     QHash<QChar,QChar> repl;
-    repl.insert(' ',   's');
     repl.insert('\n',  'n');
     repl.insert('\t',  't');
     repl.insert('\r',  'r');
@@ -466,6 +465,15 @@ XdgDesktopFile& XdgDesktopFile::operator=(const XdgDesktopFile& other)
 {
     d = other.d;
     return *this;
+}
+
+
+/************************************************
+
+ ************************************************/
+bool XdgDesktopFile::operator==(const XdgDesktopFile &other) const
+{
+    return d->mItems == other.d->mItems;
 }
 
 

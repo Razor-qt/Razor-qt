@@ -1,9 +1,25 @@
+cmake_minimum_required(VERSION 2.6)
 OPTION(ENABLE_LIGHTDM_GREETER "Build lightdm greeter" ON)
 
 if (ENABLE_LIGHTDM_GREETER)
 
 set(PROJECT razor-lightdm-greeter)
 project($PROJECT)
+
+
+# This HACK is here to allow greeter to be built as a standalone binary...
+# TODO/FIXME: check all modules to be built standalone...
+if (CMAKE_SOURCE_DIR STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+    message(WARNING "This is a standalone build of razor's lightdm greeter.")
+    # This allows to install and read the configs from non-standard locations
+    add_definitions(-DSHARE_DIR=\"${CMAKE_INSTALL_PREFIX}/share/razor/\")
+else ()
+    message(STATUS "LightDM Greeter is a part of razor-qt build")
+endif()
+
+
+find_package ( Qt4 REQUIRED )
+include ( ${QT_USE_FILE} )
 
 # check for new version
 include(FindPkgConfig)
@@ -85,7 +101,7 @@ else()
 
     link_directories( ${LIGHTDM_QT_LIBRARY_DIRS} )
     add_executable ( razor-lightdm-greeter ${razor-lightdm-greeter_SRCS} ${UIS} ${RSCS} ${TRS} ${MOCS} )
-    target_link_libraries ( razor-lightdm-greeter  razorqt ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY} ${LIGHTDM_QT_LIBRARIES} )
+    target_link_libraries ( razor-lightdm-greeter  razorqt ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${LIGHTDM_QT_LIBRARIES} )
 
     file(GLOB DESKTOP_FILES resources/*.desktop)
 
