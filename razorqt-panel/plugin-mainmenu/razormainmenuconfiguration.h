@@ -48,7 +48,7 @@ public:
     ~RazorMainMenuConfiguration();
 
 protected:
-	void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e);
 
 private:
     Ui::RazorMainMenuConfiguration *ui;
@@ -59,9 +59,9 @@ private slots:
     /*
       Saves settings in conf file.
     */
-	void saveSettings();
+    void saveSettings();
     void loadSettings();
-	void onResetClick();
+    void onResetClick();
     void chooseMenuFile();
 };
 

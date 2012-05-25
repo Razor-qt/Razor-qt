@@ -177,8 +177,8 @@ void RazorMainMenu::settingsChanged()
 
 
     mShortcut->setShortcut(settings().value("shortcut", "ALT+F1").toString());
-	mTopMenuStyle.setIconSize(settings().value("iconSize", 16).toInt());
-	mMenuStyle.setIconSize(settings().value("iconSize", 16).toInt());
+    mTopMenuStyle.setIconSize(settings().value("iconSize", 16).toInt());
+    mMenuStyle.setIconSize(settings().value("iconSize", 16).toInt());
 }
 
 
@@ -200,7 +200,7 @@ void RazorMainMenu::buildMenu()
     QMenu *oldMenu = mMenu;
     mMenu = menu;
     delete oldMenu;
-	oldMenu = NULL;
+    oldMenu = NULL;
 }
 
 

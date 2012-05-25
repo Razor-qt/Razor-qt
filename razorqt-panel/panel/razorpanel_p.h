@@ -32,6 +32,7 @@
 
 #include "razorpanel.h"
 #include "razorpanelplugin.h"
+#include "configpaneldialog.h"
 #include <razorqt/razorplugininfo.h>
 #include <QtGui/QAction>
 #include <QtCore/QVariantAnimation>
@@ -73,7 +74,7 @@ public slots:
     void onRemovePlugin();
     void onMovePlugin();
     void startMoveWidget();
-    void updateSize(int height, int width, bool percent, RazorPanel::Alignment alignment, bool useThemeSize);
+    void updateSize(RazorPanelConfigData data);
 
 private:
     void loadPlugins();
@@ -91,6 +92,7 @@ private:
     int mWidth;
     bool mWidthInPercents;
     int mScreenNum;
+    float mOpacity;
     QString mConfigFile;
     RazorSettings* mSettings;
     QList<RazorPanelPlugin*> mPlugins;
@@ -125,7 +127,6 @@ public:
 
     void updateCurrentValue(const QVariant &value);
 };
-
 
 class PopupMenu: public QMenu
 {

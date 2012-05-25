@@ -28,12 +28,12 @@
 #include "razormainmenuspinbox.h"
 
 RazorMainMenuSpinBox::RazorMainMenuSpinBox(QWidget *parent) :
-	QSpinBox(parent)
+    QSpinBox(parent)
 {
 }
 
 void RazorMainMenuSpinBox::focusOutEvent(QFocusEvent *e)
 {
-	emit focusOutSignal();
-	QSpinBox::focusOutEvent(e);
+    emit focusOutSignal();
+    QSpinBox::focusOutEvent(e);
 }

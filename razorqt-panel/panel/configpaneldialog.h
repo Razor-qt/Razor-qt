@@ -41,9 +41,18 @@
 #define CFG_KEY_PERCENT     "width-percent"
 #define CFG_KEY_ALIGNMENT   "alignment"
 #define CFG_KEY_THEMESIZE   "theme-size"
+#define CFG_KEY_OPACITY        "opacity"
 
 #define CFG_FULLKEY_PLUGINS "panel/plugins"
 
+struct RazorPanelConfigData {
+    bool percent;
+    bool useThemeSize;
+    int height;
+    int width;
+    double opacity;
+    RazorPanel::Alignment alignment;
+};
 
 namespace Ui {
 class ConfigPanelDialog;
@@ -58,7 +67,7 @@ public:
     ~ConfigPanelDialog();
 
 signals:
-    void configChanged(int height, int width, bool percent, RazorPanel::Alignment, bool mUseThemeSize);
+    void configChanged(RazorPanelConfigData data);
     void positionChanged(int screen, RazorPanel::Position);
 
 public slots:
@@ -68,6 +77,7 @@ public slots:
 private slots:
     void spinBoxHeightValueChanged(int q);
     void spinBoxWidthValueChanged(int q);
+    void spinBoxOpacityValueChanged(double q);
     void comboBoxWidthTypeIndexChanged(int q);
     void comboBoxAlignmentIndexChanged(int q);
     void comboBoxPositionIndexChanged(int q);
@@ -78,14 +88,10 @@ private:
     QString mConfigFile;
     RazorSettings* mSettings;
     int mSizeDefault;
-    int mSize;
     int mLengthMax;
-    int mLength;
-    bool mWidthInPercents;
-    bool mUseThemeSize;
     int mScreenNum;
     RazorPanel::Position mPosition;
-    RazorPanel::Alignment mAlignment;
+    RazorPanelConfigData mConfigData;
 
     void addPosition(const QString& name, int screen, RazorPanel::Position position);
 };

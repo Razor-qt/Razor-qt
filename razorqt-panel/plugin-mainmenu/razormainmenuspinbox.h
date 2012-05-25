@@ -31,16 +31,16 @@
 #include <QSpinBox>
 
 class RazorMainMenuSpinBox : public QSpinBox {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	RazorMainMenuSpinBox(QWidget *parent = 0);
+    RazorMainMenuSpinBox(QWidget *parent = 0);
 
 protected:
-	void focusOutEvent(QFocusEvent *e);
+    void focusOutEvent(QFocusEvent *e);
 
 signals:
-	void focusOutSignal();
+    void focusOutSignal();
 };
 
 #endif // RAZORMAINMENUCONFIGURATIONSPINBOX_H
