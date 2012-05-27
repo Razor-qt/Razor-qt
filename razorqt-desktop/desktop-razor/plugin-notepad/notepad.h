@@ -25,7 +25,7 @@
  * Boston, MA 02110-1301 USA
  *
  * END_COMMON_COPYRIGHT_HEADER */
- 
+
 #ifndef NOTEPAD_H
 #define NOTEPAD_H
 

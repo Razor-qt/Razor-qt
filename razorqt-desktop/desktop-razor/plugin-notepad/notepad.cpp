@@ -51,11 +51,11 @@ Notepad::Notepad(QGraphicsScene *scene, const QString &configId, RazorSettings *
     QPalette palette;
     palette.setColor(backgroundRole(), Qt::transparent);
     setPalette(palette);
-   
+
     layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
-	
-    win = new NotepadWin(&Notepad::save);
+
+    win = new NotepadWin(this, &Notepad::save);
     layout->addWidget(win);
     win->setTextAndPos(text, pos);
     setLayout(layout);
