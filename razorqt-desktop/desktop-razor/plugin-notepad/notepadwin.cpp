@@ -28,16 +28,16 @@
 
 #include "notepadwin.h"
 
-#include <QtDebug>
-#include <QScrollBar>
-#include <QTextCharFormat>
+#include <QtCore/QtDebug>
+#include <QtGui/QScrollBar>
+#include <QtGui/QTextCharFormat>
 #include <qtxdg/xdgicon.h>
 
 NotepadWin::NotepadWin(Notepad *notepad, SaveFunctionPointer sv, QWidget *parent) :
-	QWidget(parent),
-	saveText(sv),
-	pad(notepad),
-	scrollBarPosition(0)
+    QWidget(parent),
+    saveText(sv),
+    pad(notepad),
+    scrollBarPosition(0)
 {
     saveTimer = new QTimer(this);
     saveTimer->setSingleShot(true);
@@ -195,7 +195,8 @@ void NotepadWin::setFormat(bool bold, GetQTextCharFormat getter, SetQTextCharFor
 {
 	QTextCharFormat fmt;
 	QTextCursor cursor = edit->textCursor();
-	if(cursor.hasSelection()) {
+	if(cursor.hasSelection())
+    {
 		int selStart = cursor.selectionStart();
 		int selEnd = cursor.selectionEnd();
 		int pos = cursor.position();
@@ -203,13 +204,16 @@ void NotepadWin::setFormat(bool bold, GetQTextCharFormat getter, SetQTextCharFor
 		int i = 0;
 		for(i = selStart; i <= selEnd; i++) {
 			cursor.setPosition(i);
-			if(bold) {
-				if(cursor.charFormat().fontWeight() == QFont::Bold) {
+			if (bold)
+            {
+				if(cursor.charFormat().fontWeight() == QFont::Bold)
+                {
 					flag = true;
 					break;
 				}
 			}
-			else if((cursor.charFormat().*getter)()) {
+			else if((cursor.charFormat().*getter)())
+            {
 				flag = true;
 				break;
 			}
@@ -283,13 +287,15 @@ void NotepadWin::onSelectionChanged()
     QTextCursor cursor = edit->textCursor();
 	NotepadFormat format;
 
-    if(cursor.hasSelection()) {
+    if(cursor.hasSelection())
+    {
         int selStart = cursor.selectionStart();
         int selEnd = cursor.selectionEnd();
         int pos = cursor.position();
         int i = 0;
 
-        for(i = selStart; i <= selEnd; i++) {
+        for(i = selStart; i <= selEnd; ++i)
+        {
             cursor.setPosition(i);
 			updateFormat(cursor, format);
         }
