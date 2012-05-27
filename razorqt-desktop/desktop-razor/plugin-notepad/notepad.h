@@ -29,14 +29,15 @@
 #ifndef NOTEPAD_H
 #define NOTEPAD_H
 
-#include <QGraphicsView>
-#include <QVBoxLayout>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QVBoxLayout>
 
 #include <razorqt/razorsettings.h>
 #include <desktopwidgetplugin.h>
 #include "notepadwin.h"
 
-class Notepad : public DesktopWidgetPlugin, public QWidget {
+class Notepad : public DesktopWidgetPlugin, public QWidget
+{
 	NotepadWin *win;
 	QVBoxLayout *layout;
 public:

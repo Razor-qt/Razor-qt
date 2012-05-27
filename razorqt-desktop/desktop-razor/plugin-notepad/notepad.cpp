@@ -26,49 +26,47 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#include <QtDebug>
-#include <QPalette>
-#include <QPropertyAnimation>
+#include <QtCore/QtDebug>
+#include <QtGui/QPalette>
+#include <QtCore/QPropertyAnimation>
 #include "notepad.h"
 
 EXPORT_RAZOR_DESKTOP_WIDGET_PLUGIN_CPP(Notepad)
 
-
 Notepad::Notepad(QGraphicsScene *scene, const QString &configId, RazorSettings *config)
-    : DesktopWidgetPlugin(scene, configId, config)
+  : DesktopWidgetPlugin(scene, configId, config)
 {
     setObjectName("Notepad");
     m_config->beginGroup(configId);
-	QString text = m_config->value("text", "").toString();
-	int x = m_config->value("x", 0).toInt();
-	int y = m_config->value("y", 0).toInt();
+    QString text = m_config->value("text", "").toString();
+    int x = m_config->value("x", 0).toInt();
+    int y = m_config->value("y", 0).toInt();
     int w = m_config->value("w", 0).toInt();
     int h = m_config->value("h", 0).toInt();
-	int pos = m_config->value("pos", 0).toInt();
+    int pos = m_config->value("pos", 0).toInt();
     m_config->endGroup();
 
-	resize(w, h);
-	move(x, y);
-	QPalette palette;
-	palette.setColor(backgroundRole(), Qt::transparent);
-	setPalette(palette);
+    resize(w, h);
+    move(x, y);
+    QPalette palette;
+    palette.setColor(backgroundRole(), Qt::transparent);
+    setPalette(palette);
    
-	layout = new QVBoxLayout(this);
-	layout->setContentsMargins(0, 0, 0, 0);
-	setLayout(layout);
+    layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
 	
-	win = new NotepadWin(this, &Notepad::save);
-	layout->addWidget(win);
-	win->setTextAndPos(text, pos);
+    win = new NotepadWin(&Notepad::save);
+    layout->addWidget(win);
+    win->setTextAndPos(text, pos);
+    setLayout(layout);
 }
 
 Notepad::~Notepad()
 {
     delete win;
-	delete layout;
+    delete layout;
 }
 
-    
 QString Notepad::info()
 {
     return QObject::tr("Display a notepad");
@@ -102,7 +100,7 @@ void Notepad::save()
     m_config->setValue("w", size().width());
     m_config->setValue("h", size().height());
     m_config->setValue("text", win->text());
-	m_config->setValue("pos", win->pos());
+    m_config->setValue("pos", win->pos());
     m_config->endGroup();
 }
 
