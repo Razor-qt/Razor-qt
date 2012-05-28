@@ -44,6 +44,7 @@ class RazorPower : public QObject
 public:
     /// RazorPower can perform next actions:
     enum Action{
+        None = -1,      /// No Action
         PowerLogout,    /// Close the current user session.
         PowerHibernate, /// Hibernate the comuter
         PowerReboot,    /// Reboot the comuter

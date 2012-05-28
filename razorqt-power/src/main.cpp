@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     RazorApplication app(argc, argv);
     bool check = false;
     bool actionSet = false;
-    RazorPower::Action action;
+    RazorPower::Action action = RazorPower::None;
     
     QStringList args = app.arguments();
     for (int i=1; i < args.count(); ++i)
