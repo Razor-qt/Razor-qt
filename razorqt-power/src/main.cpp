@@ -57,14 +57,13 @@ void help()
 int main(int argc, char *argv[])
 {
     RazorApplication app(argc, argv);
-
+    bool check = false;
+    bool actionSet = false;
+    RazorPower::Action action;
+    
     QStringList args = app.arguments();
     for (int i=1; i < args.count(); ++i)
     {
-        bool check = false;
-        bool actionSet = false;
-        RazorPower::Action action;
-        
         QString arg = args.at(i);
         if (arg == "--help" || arg == "-h" )
         {
