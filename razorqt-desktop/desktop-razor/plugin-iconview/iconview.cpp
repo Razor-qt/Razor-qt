@@ -31,7 +31,7 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QGraphicsView>
 #include <QtCore/QPropertyAnimation>
-#include <QtCore/QFileDialog>
+#include <QtGui/QFileDialog>
 
 EXPORT_RAZOR_DESKTOP_WIDGET_PLUGIN_CPP(IconView)
 
