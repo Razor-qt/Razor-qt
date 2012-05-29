@@ -29,9 +29,9 @@
 #include <razorqt/razorapplication.h>
 #include "dialog.h"
 #include "razortranslate.h"
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include <razorqt/razorpower/razorpower.h>
-#include <QDebug>
+#include <QtCore/QDebug>
 
 void help()
 {
@@ -57,10 +57,10 @@ void help()
 int main(int argc, char *argv[])
 {
     RazorApplication app(argc, argv);
-    bool check=false;
-    bool actionSet=false;
-    RazorPower::Action action;
-
+    bool check = false;
+    bool actionSet = false;
+    RazorPower::Action action = RazorPower::None;
+    
     QStringList args = app.arguments();
     for (int i=1; i < args.count(); ++i)
     {
