@@ -49,6 +49,7 @@ ConfigPanelDialog::ConfigPanelDialog(int hDefault, int wMax, RazorSettings *sett
     reset();
 
     connect(ui->spinBox_size, SIGNAL(valueChanged(int)),this, SLOT(spinBoxHeightValueChanged(int)));
+    connect(ui->doubleSpinBox_opacity, SIGNAL(valueChanged(double)), this, SLOT(spinBoxOpacityValueChanged(double)));
     connect(ui->comboBox_widthType, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxWidthTypeIndexChanged(int)));
     connect(ui->comboBox_alignment, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxAlignmentIndexChanged(int)));
     connect(ui->comboBox_position, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxPositionIndexChanged(int)));
@@ -59,21 +60,26 @@ ConfigPanelDialog::ConfigPanelDialog(int hDefault, int wMax, RazorSettings *sett
 void ConfigPanelDialog::reset()
 {
     mSettings->beginGroup(CFG_PANEL_GROUP);
-    mSize = mSettings->value(CFG_KEY_HEIGHT, mSizeDefault).toInt();
-    mWidthInPercents = mSettings->value(CFG_KEY_PERCENT, true).toBool();
-    mLength = mSettings->value(CFG_KEY_WIDTH, 100).toInt();
-    mUseThemeSize = mSettings->value(CFG_KEY_THEMESIZE, true).toBool();
-    mAlignment = RazorPanel::Alignment(mSettings->value(CFG_KEY_ALIGNMENT, RazorPanel::AlignmentCenter).toInt());
+    mConfigData.height = mSettings->value(CFG_KEY_HEIGHT, mSizeDefault).toInt();
+    mConfigData.percent = mSettings->value(CFG_KEY_PERCENT, true).toBool();
+    mConfigData.width = mSettings->value(CFG_KEY_WIDTH, 100).toInt();
+    mConfigData.useThemeSize = mSettings->value(CFG_KEY_THEMESIZE, true).toBool();
+    mConfigData.alignment = RazorPanel::Alignment(mSettings->value(CFG_KEY_ALIGNMENT, RazorPanel::AlignmentCenter).toInt());
+    mConfigData.opacity = mSettings->value(CFG_KEY_OPACITY, 1.0).toDouble();
+    if(mConfigData.opacity < 0.0 || mConfigData.opacity > 1.0)
+        mConfigData.opacity = 1.0;
+
     mPosition = RazorPanelPrivate::strToPosition(mSettings->value(CFG_KEY_POSITION).toString(), RazorPanel::PositionBottom);
     mScreenNum = mSettings->value(CFG_KEY_SCREENNUM, QApplication::desktop()->primaryScreen()).toInt();
     mSettings->endGroup();
 
-    ui->spinBox_size->setValue(mSize);
-    ui->spinBox_length->setMaximum(mWidthInPercents ? 100 : mLengthMax);
-    ui->spinBox_length->setValue(mLength);
-    ui->comboBox_widthType->setCurrentIndex(mWidthInPercents ? 0 : 1);
-    ui->comboBox_alignment->setCurrentIndex(mAlignment + 1);
-    ui->checkBox_useTheme->setChecked(mUseThemeSize);
+    ui->spinBox_size->setValue(mConfigData.height);
+    ui->spinBox_length->setMaximum(mConfigData.percent ? 100 : mLengthMax);
+    ui->spinBox_length->setValue(mConfigData.width);
+    ui->comboBox_widthType->setCurrentIndex(mConfigData.percent ? 0 : 1);
+    ui->comboBox_alignment->setCurrentIndex(mConfigData.alignment + 1);
+    ui->checkBox_useTheme->setChecked(mConfigData.useThemeSize);
+    ui->doubleSpinBox_opacity->setValue(mConfigData.opacity);
 
     if (ui->comboBox_position->count() == 0)
     {
@@ -104,7 +110,7 @@ void ConfigPanelDialog::reset()
             ui->comboBox_position->setCurrentIndex(ix);
     }
 
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseThemeSize);
+    emit configChanged(mConfigData);
     emit positionChanged(mScreenNum, mPosition);
 }
 
@@ -117,11 +123,12 @@ void ConfigPanelDialog::save()
 {
     // Save is separate here to reduce disk I/O while resizing
     mSettings->beginGroup(CFG_PANEL_GROUP);
-    mSettings->setValue(CFG_KEY_WIDTH, mLength);
-    mSettings->setValue(CFG_KEY_PERCENT, mWidthInPercents);
-    mSettings->setValue(CFG_KEY_HEIGHT, mSize);
-    mSettings->setValue(CFG_KEY_ALIGNMENT, mAlignment);
-    mSettings->setValue(CFG_KEY_THEMESIZE, mUseThemeSize);
+    mSettings->setValue(CFG_KEY_WIDTH, mConfigData.width);
+    mSettings->setValue(CFG_KEY_PERCENT, mConfigData.percent);
+    mSettings->setValue(CFG_KEY_HEIGHT, mConfigData.height);
+    mSettings->setValue(CFG_KEY_ALIGNMENT, mConfigData.alignment);
+    mSettings->setValue(CFG_KEY_THEMESIZE, mConfigData.useThemeSize);
+    mSettings->setValue(CFG_KEY_OPACITY, mConfigData.opacity);
     mSettings->setValue(CFG_KEY_POSITION, RazorPanelPrivate::positionToStr(mPosition));
     mSettings->setValue(CFG_KEY_SCREENNUM, mScreenNum);
     mSettings->endGroup();
@@ -135,38 +142,45 @@ void ConfigPanelDialog::addPosition(const QString& name, int screen, RazorPanel:
 
 void ConfigPanelDialog::spinBoxWidthValueChanged(int q)
 {
-    mLength=q;
+    mConfigData.width = q;
     // if panel width not max, user can plased it on left/rigth/center
-    if ((mWidthInPercents && mLength < 100) || (!mWidthInPercents && mLength < mLengthMax))
+    if((mConfigData.percent && mConfigData.width < 100) ||
+            (!mConfigData.percent && mConfigData.width < mLengthMax))
         ui->comboBox_alignment->setEnabled(true);
     else
        ui->comboBox_alignment->setEnabled(false);
 
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseThemeSize);
+    emit configChanged(mConfigData);
+}
+
+void ConfigPanelDialog::spinBoxOpacityValueChanged(double q)
+{
+    mConfigData.opacity = q < 0.0 || q > 1.0 ? 1.0 : q;
+    emit configChanged(mConfigData);
 }
 
 void ConfigPanelDialog::comboBoxWidthTypeIndexChanged(int q)
 {
     bool inPercents = (q == 0);
-    if (inPercents == mWidthInPercents)
+    if(inPercents == mConfigData.percent)
         return;
-    mWidthInPercents = inPercents;
+    mConfigData.percent = inPercents;
 
     int width;
-    if (mWidthInPercents)  // %
-        width = mLength * 100 / mLengthMax;
+    if(mConfigData.percent)  // %
+        width = mConfigData.width * 100 / mLengthMax;
     else                // px
-        width = (mLength * mLengthMax) / 100;
+        width = (mConfigData.width * mLengthMax) / 100;
 
-    ui->spinBox_length->setMaximum(mWidthInPercents ? 100 : mLengthMax);
+    ui->spinBox_length->setMaximum(mConfigData.percent ? 100 : mLengthMax);
     ui->spinBox_length->setValue(width);
-    mLength = width;
+    mConfigData.width = width;
 }
 
 void ConfigPanelDialog::comboBoxAlignmentIndexChanged(int q)
 {
-    mAlignment = RazorPanel::Alignment(q - 1);
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseThemeSize);
+    mConfigData.alignment = RazorPanel::Alignment(q - 1);
+    emit configChanged(mConfigData);
 }
 
 void ConfigPanelDialog::comboBoxPositionIndexChanged(int q)
@@ -179,26 +193,24 @@ void ConfigPanelDialog::comboBoxPositionIndexChanged(int q)
 
 void ConfigPanelDialog::spinBoxHeightValueChanged(int q)
 {
-    mSize=q;
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseThemeSize);
+    mConfigData.height = q;
+    emit configChanged(mConfigData);
 }
 
 void ConfigPanelDialog::checkBoxUseThemeSizeChanged(bool state)
 {
-    mUseThemeSize = state;
+    mConfigData.useThemeSize = state;
 
-    if (mUseThemeSize)
-    {
+    if(mConfigData.useThemeSize) {
         ui->label_size->setEnabled(false);
         ui->spinBox_size->setEnabled(false);
         ui->label_px->setEnabled(false);
     }
-    else
-    {
+    else {
         ui->label_size->setEnabled(true);
         ui->spinBox_size->setEnabled(true);
         ui->label_px->setEnabled(true);
     }
 
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseThemeSize);
+    emit configChanged(mConfigData);
 }

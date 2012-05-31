@@ -27,8 +27,10 @@
 
 
 #include "razormainmenuconfiguration.h"
+#include "razormainmenuspinbox.h"
 #include "ui_razormainmenuconfiguration.h"
 #include <qtxdg/xdgmenu.h>
+#include <QDebug>
 
 #include <QtGui/QFileDialog>
 
@@ -42,17 +44,14 @@ RazorMainMenuConfiguration::RazorMainMenuConfiguration(QSettings &settings, QWid
     setObjectName("MainMenuConfigurationWindow");
     ui->setupUi(this);
 
-    connect(ui->buttons, SIGNAL(clicked(QAbstractButton*)), this, SLOT(dialogButtonsAction(QAbstractButton*)));
-    connect(ui->showTextCB, SIGNAL(toggled(bool)), ui->textL, SLOT(setEnabled(bool)));
-    connect(ui->showTextCB, SIGNAL(toggled(bool)), ui->textLE, SLOT(setEnabled(bool)));
-
     loadSettings();
 
-    connect(ui->showTextCB, SIGNAL(toggled(bool)), this, SLOT(showTextChanged(bool)));
-    connect(ui->textLE, SIGNAL(textEdited(QString)), this, SLOT(textButtonChanged(QString)));
+    connect(ui->buttons->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui->buttons->button(QDialogButtonBox::Reset), SIGNAL(clicked()), this, SLOT(onResetClick()));
+    connect(ui->showTextCB, SIGNAL(toggled(bool)), ui->textL, SLOT(setEnabled(bool)));
+    connect(ui->showTextCB, SIGNAL(toggled(bool)), ui->textLE, SLOT(setEnabled(bool)));
     connect(ui->chooseMenuFilePB, SIGNAL(clicked()), this, SLOT(chooseMenuFile()));
-    
-    connect(ui->shortcutEd, SIGNAL(keySequenceChanged(QString)), this, SLOT(shortcutChanged(QString)));
+    connect(ui->sizeSB, SIGNAL(focusOutSignal()), this, SLOT(saveSettings()));
 }
 
 RazorMainMenuConfiguration::~RazorMainMenuConfiguration()
@@ -60,10 +59,27 @@ RazorMainMenuConfiguration::~RazorMainMenuConfiguration()
     delete ui;
 }
 
+void RazorMainMenuConfiguration::closeEvent(QCloseEvent *e)
+{
+    saveSettings();
+    QDialog::closeEvent(e);
+}
+
+void RazorMainMenuConfiguration::saveSettings()
+{
+    qDebug() << "Saving main menu plugin settings...";
+    mSettings.setValue("text", ui->textLE->text());
+    mSettings.setValue("showText", ui->showTextCB->isChecked());
+    mSettings.setValue("iconSize", ui->sizeSB->value());
+    mSettings.setValue("menu_file", ui->menuFilePathLE->text());
+    mSettings.setValue("shortcut", ui->shortcutEd->keySequence().toString());
+}
+
 void RazorMainMenuConfiguration::loadSettings()
 {
     ui->showTextCB->setChecked(mSettings.value("showText", false).toBool());
-    ui->textLE->setText(mSettings.value("text", "").toString());
+    ui->textLE->setText(mSettings.value("text", tr("Start")).toString());
+    ui->sizeSB->setValue(mSettings.value("iconSize", 16).toInt());
 
     QString menuFile = mSettings.value("menu_file", "").toString();
     if (menuFile.isEmpty())
@@ -74,40 +90,15 @@ void RazorMainMenuConfiguration::loadSettings()
     ui->shortcutEd->setKeySequence(mSettings.value("shortcut", "Alt+F1").toString());
 }
 
-void RazorMainMenuConfiguration::textButtonChanged(const QString &value)
+void RazorMainMenuConfiguration::onResetClick()
 {
-    mSettings.setValue("text", value);
-}
-
-void RazorMainMenuConfiguration::showTextChanged(bool value)
-{
-    mSettings.setValue("showText", value);
+    mOldSettings.loadToSettings();
+    loadSettings();
 }
 
 void RazorMainMenuConfiguration::chooseMenuFile()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Choose menu file"), "~", tr("Menu files (*.menu)"));
     if (!path.isEmpty())
-    {
         ui->menuFilePathLE->setText(path);
-        mSettings.setValue("menu_file", path);
-    }
-}
-
-void RazorMainMenuConfiguration::shortcutChanged(const QString &value)
-{
-    mSettings.setValue("shortcut", ui->shortcutEd->keySequence().toString());
-}
-
-void RazorMainMenuConfiguration::dialogButtonsAction(QAbstractButton *btn)
-{
-    if (ui->buttons->buttonRole(btn) == QDialogButtonBox::ResetRole)
-    {
-        mOldSettings.loadToSettings();
-        loadSettings();
-    }
-    else
-    {
-        close();
-    }
 }

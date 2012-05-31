@@ -44,13 +44,10 @@
 #include <QtGui/QContextMenuEvent>
 
 #include <qtxdg/xdgicon.h>
-
 #include <razorqt/xfitman.h>
 #include <qtxdg/xdgdirs.h>
 #include <QtGui/QWidgetAction>
 #include <QtGui/QToolButton>
-
-
 
 /************************************************
  Returns the Position by the string.
@@ -162,6 +159,9 @@ void RazorPanelPrivate::init()
     mWidthInPercents = mSettings->value(CFG_KEY_PERCENT, true).toBool();
     mWidth = mSettings->value(CFG_KEY_WIDTH, 100).toInt();
     mUseThemeSize = mSettings->value(CFG_KEY_THEMESIZE, true).toBool();
+    mOpacity = mSettings->value(CFG_KEY_OPACITY, 1.0).toFloat();
+    if(mOpacity < 0.0)
+        mOpacity = 1.0;
     mSettings->endGroup();
 
     q->setLayout(mLayout);
@@ -346,6 +346,8 @@ void RazorPanelPrivate::realign()
 
     QRect screen = QApplication::desktop()->screenGeometry(mScreenNum);
     QRect rect;
+
+    q->setWindowOpacity(mOpacity);
 
     if (q->isHorizontal())
     {
@@ -585,8 +587,7 @@ void RazorPanelPrivate::showConfigPanelDialog()
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, SIGNAL(reset()), page, SLOT(reset()));
     connect(dlg, SIGNAL(save()), page, SLOT(save()));
-    connect(page, SIGNAL(configChanged(int, int, bool, RazorPanel::Alignment, bool)),
-                      SLOT(updateSize(int, int, bool, RazorPanel::Alignment, bool)));
+    connect(page, SIGNAL(configChanged(RazorPanelConfigData)), SLOT(updateSize(RazorPanelConfigData)));
     connect(page, SIGNAL(positionChanged(int, RazorPanel::Position)), SLOT(switchPosition(int, RazorPanel::Position)));
     dlg->show();
 }
@@ -595,18 +596,18 @@ void RazorPanelPrivate::showConfigPanelDialog()
 /************************************************
 
  ************************************************/
-void RazorPanelPrivate::updateSize(int height, int width, bool percent, RazorPanel::Alignment alignment, bool useThemeSize)
+void RazorPanelPrivate::updateSize(RazorPanelConfigData data)
 {
-    mHeight = height;
-    mWidth = width;
-    mWidthInPercents = percent;
-    mAlignment = alignment;    
-    mUseThemeSize = useThemeSize;
+    mHeight = data.height;
+    mWidth = data.width;
+    mWidthInPercents = data.percent;
+    mAlignment = data.alignment;
+    mUseThemeSize = data.useThemeSize;
+    mOpacity = data.opacity;
 
     updatePluginsMinSize();
     realign();
 }
-
 
 /************************************************
 
@@ -794,7 +795,6 @@ void RazorPanel::showPopupMenu(RazorPanelPlugin *plugin)
     menu.exec(QCursor::pos());
     qDeleteAll(pluginsMenus);
 }
-
 
 /************************************************
 
