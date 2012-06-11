@@ -181,7 +181,8 @@ void MountButton::showMessage(const QString &text)
     RazorNotification::notify(toolTip(), text,
 #if QT_VERSION >= 0x040700
                               icon().name()
-#endif
+#else
+                              "application-x-cd-image"#endif
                               );
 }
 
