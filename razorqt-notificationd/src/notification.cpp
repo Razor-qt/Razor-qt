@@ -192,7 +192,7 @@ QPixmap Notification::getPixmapFromHint(const QVariant &argument) const
     arg.endStructure();
     QImage img = QImage((uchar*)data.constData(), width, height, QImage::Format_ARGB32).rgbSwapped();
 
-    p.convertFromImage(img);
+    p.convertImage(img); // see https://groups.google.com/group/razor-qt/browse_thread/thread/36cec5da83ff6291
     return p;
 }
 
