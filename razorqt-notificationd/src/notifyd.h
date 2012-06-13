@@ -33,6 +33,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
 #include <QtCore/QStringList>
+#include <QtCore/QFileSystemWatcher>
 
 #include "notificationarea.h"
 
@@ -72,10 +73,15 @@ signals:
                            const QString &description, const QString &icon,
                            int timeout, const QStringList& actions, const QVariantMap& hints);
 
+private slots:
+    void applySettings();
+
 private:
     uint mId;
-    NotificationArea *m_area;
     RazorSettings *m_settings;
+    NotificationArea *m_area;
+    QFileSystemWatcher *m_watcher;
+    int m_defaultTimeout;
 };
 
 #endif // NOTIFYD_H

@@ -39,10 +39,10 @@
 Notifyd::Notifyd(QObject* parent)
     : QObject(parent),
       mId(0),
-      m_settings(new RazorSettings("notifications", this))
+      m_settings(new RazorSettings("notifications", this)),
+      m_area(new NotificationArea(m_settings)),
+      m_watcher(new QFileSystemWatcher(QStringList(m_settings->fileName()), this))
 {
-    m_area = new NotificationArea();
-
     connect(this, SIGNAL(notificationAdded(uint,QString,QString,QString,QString,int,QStringList,QVariantMap)),
             m_area->layout(), SLOT(addNotification(uint,QString,QString,QString,QString,int,QStringList,QVariantMap)));
     connect(this, SIGNAL(notificationClosed(uint, uint)),
@@ -52,8 +52,9 @@ Notifyd::Notifyd(QObject* parent)
             this, SIGNAL(NotificationClosed(uint,uint)));
     connect(m_area->layout(), SIGNAL(actionInvoked(uint, QString)),
             this, SIGNAL(ActionInvoked(uint,QString)));
-    connect(m_settings, SIGNAL(settingsChanged()), m_area, SLOT(applySettings()));
+    connect(m_watcher, SIGNAL(fileChanged(QString)), SLOT(applySettings()));
 
+    applySettings();
 }
 
 Notifyd::~Notifyd()
@@ -64,6 +65,13 @@ Notifyd::~Notifyd()
 void Notifyd::CloseNotification(uint id)
 {
     emit notificationClosed(id, 3);
+}
+
+void Notifyd::applySettings()
+{
+    m_settings->sync();
+    m_defaultTimeout = m_settings->value("server_decides", 10).toInt();
+    m_area->applySettings();
 }
 
 QStringList Notifyd::GetCapabilities()
@@ -126,10 +134,8 @@ uint Notifyd::Notify(const QString& app_name,
 #endif
 
     // handling the "server decides" timeout
-    if (expire_timeout == -1) {
-        expire_timeout = m_settings->value("server_decides", 10).toInt();
-        expire_timeout *= 1000;
-    }
+    if (expire_timeout == -1)
+        expire_timeout = m_defaultTimeout * 1000;
 
     emit notificationAdded(ret, app_name, summary, body, app_icon, expire_timeout, actions, hints);
 

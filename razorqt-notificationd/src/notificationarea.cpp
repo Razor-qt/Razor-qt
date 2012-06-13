@@ -30,9 +30,9 @@
 #include "notificationarea.h"
 #include <QtDebug>
 
-NotificationArea::NotificationArea(QWidget *parent)
+NotificationArea::NotificationArea(RazorSettings* settings, QWidget *parent)
     : QScrollArea(parent),
-      m_settings(new RazorSettings("notifications", this))
+      m_settings(settings)
 {
     setObjectName("NotificationArea");
     qDebug() << "AREA" << m_settings->fileName() << m_settings;
@@ -63,11 +63,6 @@ NotificationArea::NotificationArea(QWidget *parent)
     connect(m_layout, SIGNAL(allNotificationsClosed()), this, SLOT(close()));
     connect(m_layout, SIGNAL(notificationAvailable()), this, SLOT(show()));
     connect(m_layout, SIGNAL(heightChanged(int)), this, SLOT(setHeight(int)));
-
-    // TODO/FIXME: WTF?! Why it does not synchronize?
-    connect(m_settings, SIGNAL(settingsChanged()),
-            this, SLOT(applySettings()));
-    applySettings();
 }
 
 void NotificationArea::setHeight(int contentHeight)
