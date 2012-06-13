@@ -40,11 +40,9 @@ class NotificationArea : public QScrollArea
     Q_OBJECT
 public:
 
-    explicit NotificationArea(QWidget *parent = 0);
+    explicit NotificationArea(RazorSettings *settings, QWidget *parent = 0);
 
     NotificationLayout* layout() { return m_layout; }
-
-public slots:
     void applySettings();
 
 private:
