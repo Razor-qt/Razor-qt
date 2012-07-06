@@ -109,9 +109,7 @@ protected:
     bool mIsMounted;
     bool mIsEjectable;
 private:
-    Q_DISABLE_COPY(RazorMountDevice);
-
-
+    Q_DISABLE_COPY(RazorMountDevice)
 };
 
 typedef QList<RazorMountDevice*> RazorMountDeviceList;
