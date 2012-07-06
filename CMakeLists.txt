@@ -28,7 +28,7 @@ message(STATUS "")
 
 add_definitions ( -Wall )
 set( QT_USE_QTDBUS 1 )
-find_package ( Qt4 4.6.0 REQUIRED )
+find_package ( Qt4 4.7.0 REQUIRED )
 include ( ${QT_USE_FILE} )
 include_directories (
 	${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
