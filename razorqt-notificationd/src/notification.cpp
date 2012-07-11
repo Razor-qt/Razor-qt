@@ -288,7 +288,7 @@ NotificationTimer::NotificationTimer(QObject *parent)
 
 void NotificationTimer::start(int msec)
 {
-    m_startTime = QDateTime();
+    m_startTime = QDateTime::currentDateTime();
     m_intervalMsec = msec;
     QTimer::start(msec);
 }
@@ -299,7 +299,7 @@ void NotificationTimer::pause()
         return;
 
     stop();
-    m_intervalMsec = m_startTime.msecsTo(QDateTime());
+    m_intervalMsec = m_startTime.time().msecsTo(QDateTime::currentDateTime().time());
 }
 
 void NotificationTimer::resume()
