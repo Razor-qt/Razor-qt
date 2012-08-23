@@ -46,13 +46,13 @@ razor_translate_ts(razor-sessioncfg_QM_FILES
         ${razor-sessioncfg_UI_FILES}
 )
 
-razor_translate_desktop2(razor-sessioncfg_DESKTOP_FILES
+razor_translate_desktop2(DESKTOP_FILES
     SOURCES
         razor-config-session.desktop.in
 ) 
 #************************************************
 
-add_executable ( razor-config-session ${razor-sessioncfg_SRCS} ${razor-sessioncfg_UIS} ${razor-sessioncfg_MOCS} ${razor-sessioncfg_DESKTOP_FILES} ${razor-sessioncfg_QM_FILES})
+add_executable ( razor-config-session ${razor-sessioncfg_SRCS} ${razor-sessioncfg_UIS} ${razor-sessioncfg_MOCS} ${DESKTOP_FILES} ${razor-sessioncfg_QM_FILES})
 add_dependencies( razor-config-session razorqt qtxdg)
 target_link_libraries ( razor-config-session  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY} ${QT_QTXML_LIBRARY} ${X11_X11_LIB} razorqt qtxdg)
 
