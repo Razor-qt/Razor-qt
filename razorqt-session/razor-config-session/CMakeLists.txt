@@ -46,7 +46,7 @@ razor_translate_ts(razor-sessioncfg_QM_FILES
         ${razor-sessioncfg_UI_FILES}
 )
 
-razor_translate_desktop2(razor-sessioncfg_DESKTOP_FILES
+razor_translate_desktop(razor-sessioncfg_DESKTOP_FILES
     SOURCES
         razor-config-session.desktop.in
 ) 
