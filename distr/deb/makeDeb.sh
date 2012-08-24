@@ -19,7 +19,7 @@ HELP_TEXT
 
 
 # VARIABLES is a array
-declare -A VARIABLES
+declare -a VARIABLES
 
 
 function checkIf
