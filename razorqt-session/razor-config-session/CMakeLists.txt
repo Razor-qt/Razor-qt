@@ -49,8 +49,10 @@ razor_translate_desktop2(DESKTOP_FILES
         razor-config-session.desktop.in
 ) 
 #************************************************
+
 QT4_WRAP_UI(razor-sessioncfg_UIS ${razor-sessioncfg_UI_FILES})
 QT4_WRAP_CPP(razor-sessioncfg_MOCS ${razor-sessioncfg_HDRS})
+
 
 add_executable ( razor-config-session ${razor-sessioncfg_SRCS} ${razor-sessioncfg_UIS} ${razor-sessioncfg_MOCS} ${razor-sessioncfg_QM_FILES} ${DESKTOP_FILES})
 add_dependencies( razor-config-session razorqt qtxdg)
@@ -58,3 +60,4 @@ target_link_libraries ( razor-config-session  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LI
 
 INSTALL(TARGETS razor-config-session RUNTIME DESTINATION bin)
 INSTALL(FILES ${DESKTOP_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+INSTALL(FILES ${razor-sessioncfg_QM_FILES} ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
