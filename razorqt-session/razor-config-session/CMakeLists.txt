@@ -60,4 +60,4 @@ target_link_libraries ( razor-config-session  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LI
 
 INSTALL(TARGETS razor-config-session RUNTIME DESTINATION bin)
 INSTALL(FILES ${DESKTOP_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-INSTALL(FILES ${razor-sessioncfg_QM_FILES} ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
+INSTALL(FILES ${razor-sessioncfg_QM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
