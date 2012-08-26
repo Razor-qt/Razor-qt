@@ -17,60 +17,164 @@ Options
 HELP_TEXT
 }
 
-function checkIf
+
+
+VARIABLES=""
+
+function setVariable
 {
-  shift
-  local TYPE=$1
-  shift
-  if [ "$TYPE" = "DISTRIB" ]; then VAL=${DISTRIB}; fi
-  if [ "$TYPE" = "RELEASE" ]; then VAL=${RELEASE}; fi
+    VARIABLES="${VARIABLES}$2=$3\n"
+}
 
-  for i in $@ ; do
-    [ "$i" = "${VAL}" ] && return 0
-  done
-
-  return 1
+function getVariable
+{
+    printf $VARIABLES | awk -F'=' "/${1}=/ {print(\$2)}"
 }
 
 
-function prepareFile
+function checkIf
 {
-  local file=$1
-  local skip=0
-  while  IFS='' read "line"; do
-    local cmd=`echo $line | awk '{print $1 }' | tr '[:lower:]' '[:upper:]'`
-    case $cmd in
-      %IF)
-        checkIf $line || skip=1
-        ;;
+    shift
+    local name=$1
+    shift
 
-      %IFNOT)
-        checkIf $line && skip=1
-        ;;
+    case $name in
+        DISTRIB)
+            val=`echo $DISTRIB | awk '{print $1 }' | tr '[:lower:]' '[:upper:]'`;
+            local caseInsensitive=1;
+            ;;
 
-      %ELSE)
-        let "skip = 1-$skip"
-        ;;
+        RELEASE)
+            val=`echo $RELEASE | awk '{print $1 }' | tr '[:lower:]' '[:upper:]'`;
+            local caseInsensitive=1;
+            ;;
 
-      %ENDIF)
-        skip=0
-        ;;
-
-      *)
-        if [ "$skip" = 0 ]; then
-			echo "$line" | sed            \
-				-e"s/%NAME%/${NAME}/g"    \
-				-e"s/%VERSION%/${VER}/g"  \
-				-e"s/%RELEASE%/${RELEASE}/g" \
-				-e"s/%DISTRIB%/${DISTRIB}/g" \
-				-e"s/%DATE%/${DATE}/g" \
-				-e"s/%DEBEMAIL%/${DEBEMAIL}/g" \
-				-e"s/%DEBFULLNAME%/${DEBFULLNAME}/g"
-		fi
-        ;;
+        *)
+            val=`getVariable ${name}`
+            ;;
     esac
 
-  done < "${file}"
+    for i in $@ ; do
+        local a=$i
+        [ "$caseInsensitive" ] && a=`echo $i | awk '{print $1 }' | tr '[:lower:]' '[:upper:]'`
+        if [ "$a" = "$val" ]; then
+            echo 1
+            return 1
+        fi
+    done
+
+    echo 0
+}
+
+
+token=''
+line=''
+function nextToken
+{
+    while  IFS='' read "line"; do
+        token=`echo $line | awk '{print $1 }' | tr '[:lower:]' '[:upper:]'`
+        case $token in
+            %IF|%IFNOT|%ELSIF|%ELSEIF|%ELSE|%ENDIF|%SET)
+                return 0
+                ;;
+
+            *)
+                echo "$line" | sed            \
+                    -e"s/%NAME%/${NAME}/g"    \
+                    -e"s/%VERSION%/${VER}/g"  \
+                    -e"s/%RELEASE%/${RELEASE}/g" \
+                    -e"s/%DISTRIB%/${DISTRIB}/g" \
+                    -e"s/%DATE%/${DATE}/g" \
+                    -e"s/%DEBEMAIL%/${DEBEMAIL}/g" \
+                    -e"s/%DEBFULLNAME%/${DEBFULLNAME}/g"
+        esac
+    done
+
+    token=''
+    return
+}
+
+
+
+function skipBlock
+{
+    local level=0
+    while  IFS='' read "line"; do
+        token=`echo $line | awk '{print $1 }' | tr '[:lower:]' '[:upper:]'`
+        case $token in
+            %IF|%IFNOT)
+                let 'level++'
+                ;;
+
+            %ENDIF)
+                [ $level = "0" ] && break
+                let 'level--'
+                ;;
+
+            %ELSIF|%ELSEIF|%ELSE)
+                [ $level = "0" ] && break
+                ;;
+
+            *)
+                ;;
+        esac
+    done
+}
+
+
+function processBlock
+{
+    nextToken
+
+    while [ "$token" != "" ]; do
+        case $token in
+            %IF|%IFNOT)
+                local skip=
+                while [ "$token" != "" ] && [ $token != "%ENDIF" ]; do
+                    case $token in
+                        %IF|%ELSIF|%ELSEIF)
+                            check=$(checkIf $line)
+                            ;;
+
+                        %IFNOT)
+                            check=$(checkIf $line)
+                            check=$(( ! $check ))
+                            ;;
+
+                        %ELSE)
+                            check=1
+                            ;;
+                    esac
+
+                    if [ "$skip" != "1" ] && [ "$check" = "1" ]; then
+                        processBlock
+                        skip=1
+                    else
+                        skipBlock
+                    fi
+                done
+                ;;
+
+            %SET)
+                setVariable $line
+                ;;
+
+            %ELSIF|%ELSEIF|%ELSE|%ENDIF)
+                break
+                ;;
+
+            *)
+                echo "Unexpected token '$line'" >&2
+                exit 3
+                ;;
+        esac
+        nextToken
+    done
+}
+
+function prepareFile
+{
+    processBlock < $1
 }
 
 
@@ -173,7 +277,7 @@ if [ -z "$VER" ]; then
 fi
 
 if [ -z "$OUT_DIR" ]; then
-    OUT_DIR="${HOME}/{$NAME}_${VER}_deb"
+    OUT_DIR="${HOME}/${NAME}_${VER}_deb"
 fi
 
 if [ -z "$DEBEMAIL" ]; then
@@ -211,12 +315,11 @@ for RELEASE in ${RELEASE}; do
     DATE=`date -R`
     for src in `find ${DIR}/distr/deb/debian -type f `; do
         dest=`echo $src | sed -e's|/distr/deb||'`
+
         prepareFile "${src}" > ${dest}
         chmod --reference "${src}" ${dest}
     done
     # Debin directory .....................
-
-
     cd ${DIR} && debuild ${TYPE} ${SIGN} -rfakeroot
 done
 

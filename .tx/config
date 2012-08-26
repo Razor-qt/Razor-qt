@@ -1,12 +1,19 @@
 [main]
 host = https://www.transifex.net
 type = QT
+minimum-perc = 5
 
 [razor-qt.razor-session]
 type = QT
-source_file = razorqt-session/translations/razor-session.ts.src
+source_file = razorqt-session/razor-session/translations/razor-session.ts.src
 source_lang = en
-file_filter = razorqt-session/translations/razor-session_<lang>.ts
+file_filter = razorqt-session/razor-session/translations/razor-session_<lang>.ts
+
+[razor-qt.razor-config-session]
+type = QT
+source_file = razorqt-session/razor-config-session/translations/razor-config-session.ts.src
+source_lang = en
+file_filter = razorqt-session/razor-config-session/translations/razor-config-session_<lang>.ts
 
 [razor-qt.analogclock]
 type = QT
@@ -14,11 +21,11 @@ source_file = razorqt-desktop/desktop-razor/plugin-analogclock/translations/anal
 source_lang = en
 file_filter = razorqt-desktop/desktop-razor/plugin-analogclock/translations/analogclock_<lang>.ts
 
-[razor-qt.qtxdg]
+[razor-qt.libqtxdg]
 type = QT
-source_file = libraries/qtxdg/translations/qtxdg.ts.src
+source_file = libraries/qtxdg/translations/libqtxdg.ts.src
 source_lang = en
-file_filter = libraries/qtxdg/translations/qtxdg_<lang>.ts
+file_filter = libraries/qtxdg/translations/libqtxdg_<lang>.ts
 
 [razor-qt.librazorqt]
 type = QT

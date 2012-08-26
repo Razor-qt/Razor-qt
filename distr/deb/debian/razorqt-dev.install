@@ -1,7 +1,0 @@
-/usr/include/razormount/
-/usr/include/razorqt/
-/usr/include/razorqxt/
-/usr/bin/razor-x11info
-/usr/lib*/pkgconfig/razor*.pc
-/usr/lib*/librazor*.so
-/usr/lib*/libqtservice.so

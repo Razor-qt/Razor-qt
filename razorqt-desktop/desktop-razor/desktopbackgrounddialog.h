@@ -39,21 +39,17 @@ class DesktopBackgroundDialog : public QDialog, public Ui::DesktopBackgroundDial
     Q_OBJECT
     
 public:
-    DesktopBackgroundDialog(RazorSettings * cfg, int screen, int desktop, QSize desktopSize, const QBrush & brush, QWidget * parent);
+    DesktopBackgroundDialog(const QPixmap &preview, bool keepAspectRatio, QWidget * parent);
     ~DesktopBackgroundDialog();
-    QBrush background();
+    bool keepAspectRatio();
+    QString file() { return m_wallpaper; }
+    QString color() { return m_color.name(); }
+    RazorWorkSpaceManager::BackgroundType type() { return m_type; }
 
 private:
-    QSize m_desktopSize;
     RazorWorkSpaceManager::BackgroundType m_type;
     QColor m_color;
     QString m_wallpaper;
-
-    RazorSettings * m_config;
-    int m_screen;
-    int m_desktop;
-
-    void save();
 
 private slots:
     void colorButton_clicked();
