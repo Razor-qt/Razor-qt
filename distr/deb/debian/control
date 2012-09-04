@@ -223,7 +223,8 @@ Description: Razor-qt global keyboard shortcuts desktop tool
 
 Package: razorqt-panel
 Architecture: any
-Depends: librazorqt0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: librazorqt0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends},
+ xscreensaver | xscreensaver-gl | kscreensaver-xsaver | kscreensaver | kcometen4 | kcometen
 Replaces: razor-qt, razor-panel
 Conflicts: razor-qt, razor-panel
 Description: Razor-qt panel and its plugins
