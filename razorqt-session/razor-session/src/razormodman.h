@@ -81,6 +81,9 @@ public slots:
     */
     void logout();
 
+signals:
+    void moduleStateChanged(QString moduleName, bool state);
+
 private:
     //! \brief Show Window Manager select dialog
     QString showWmSelectDialog();
@@ -96,6 +99,9 @@ private:
 
     //! \brief map file names to module processes
     ModulesMap mNameMap;
+
+    //! \brief the window manager
+    QProcess* mWmProcess;
 
     /*! \brief Keep creashes for given process to raise a message in the
         case of repeating crashes
@@ -154,6 +160,12 @@ public:
 
     const XdgDesktopFile file;
     const QString fileName;
+
+signals:
+    void moduleStateChanged(QString name, bool state);
+
+private slots:
+    void updateState(QProcess::ProcessState newState);
 
 private:
     bool mIsTerminating;

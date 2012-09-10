@@ -47,7 +47,8 @@
  */
 RazorModuleManager::RazorModuleManager(const QString & config, const QString & windowManager, QObject* parent)
     : QObject(parent),
-    mConfig(config)
+      mConfig(config),
+      mWmProcess(new QProcess(this))
 {
     qDebug() << __FILE__ << ":" << __LINE__ << "Session" << config << "about to launch (deafult 'session')";
     if (mConfig.isEmpty())
@@ -93,10 +94,7 @@ RazorModuleManager::RazorModuleManager(const QString & config, const QString & w
             //qDebug() << "Using window manager specified with command line" << windowManager;
         }
 
-        QProcess * wmProcess = new QProcess(this);
-        wmProcess->start(wm);
-        connect(wmProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-                this, SLOT(logout()));
+        mWmProcess->start(wm);
 
         // Wait until the WM loads
         int waitCnt = 300;
@@ -156,6 +154,7 @@ void RazorModuleManager::startProcess(const XdgDesktopFile& file)
         return;
     }
     RazorModule* proc = new RazorModule(file, this);
+    connect(proc, SIGNAL(moduleStateChanged(QString,bool)), this, SIGNAL(moduleStateChanged(QString,bool)));
     proc->start();
 
     QString name = QFileInfo(file.fileName()).fileName();
@@ -169,7 +168,7 @@ void RazorModuleManager::startProcess(const QString& name)
 {
     if (!mNameMap.contains(name))
     {
-        foreach (const XdgDesktopFile& file, XdgAutoStart::desktopFileList())
+        foreach (const XdgDesktopFile& file, XdgAutoStart::desktopFileList(false))
         {
             if (QFileInfo(file.fileName()).fileName() == name)
             {
@@ -193,10 +192,8 @@ QStringList RazorModuleManager::listModules() const
 
 void RazorModuleManager::startConfUpdate()
 {
-    XdgDesktopFile desktop;
-    desktop.setValue("Type", "Application");
+    XdgDesktopFile desktop(XdgDesktopFile::ApplicationType, ":razor-confupdate", "razor-confupdate --watch");
     desktop.setValue("Name", "Razor config updater");
-    desktop.setValue("Exec", "razor-confupdate --watch");
     desktop.setValue("X-Razor-Module", true);
     startProcess(desktop);
 }
@@ -244,6 +241,7 @@ void RazorModuleManager::restartModules(int exitCode, QProcess::ExitStatus exitS
 RazorModuleManager::~RazorModuleManager()
 {
     qDeleteAll(mNameMap);
+    delete mWmProcess;
 }
 
 /**
@@ -271,6 +269,14 @@ void RazorModuleManager::logout()
             p->kill();
         }
     }
+
+    mWmProcess->terminate();
+    if (mWmProcess->state() != QProcess::NotRunning && !mWmProcess->waitForFinished())
+    {
+        qWarning() << QString("Window Manager won't terminate ... killing.");
+        mWmProcess->kill();
+    }
+
     QCoreApplication::exit(0);
 }
 
@@ -322,6 +328,7 @@ RazorModule::RazorModule(const XdgDesktopFile& file, QObject* parent) :
     file(file),
     fileName(QFileInfo(file.fileName()).fileName())
 {
+    connect(this, SIGNAL(stateChanged(QProcess::ProcessState)), SLOT(updateState(QProcess::ProcessState)));
 }
 
 void RazorModule::start()
@@ -341,4 +348,10 @@ void RazorModule::terminate()
 bool RazorModule::isTerminating()
 {
     return mIsTerminating;
+}
+
+void RazorModule::updateState(QProcess::ProcessState newState)
+{
+    if (newState != QProcess::Starting)
+        emit moduleStateChanged(fileName, (newState == QProcess::Running));
 }

@@ -57,13 +57,13 @@ razor_translate_ts(QM_FILES
         ${razor-autosuspend_UIS}
 )
 
-razor_translate_desktop2(DESKTOP_FILES
+razor_translate_desktop(DESKTOP_FILES
     SOURCES
         ${DESKTOP_FILES_IN}
 )
 #************************************************
 
-add_executable ( razor-autosuspend ${razor-autosuspend_SRCS} ${UIS} ${RSCS} ${TRS} ${MOCS} ${DESKTOP_FILES})
+add_executable ( razor-autosuspend ${razor-autosuspend_SRCS} ${UIS} ${RSCS} ${QM_FILES} ${MOCS} ${DESKTOP_FILES})
 target_link_libraries ( razor-autosuspend  razorqt ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY} )
 
 

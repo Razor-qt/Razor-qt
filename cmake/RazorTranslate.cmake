@@ -47,11 +47,18 @@ if(NOT TARGET UpdateTsFiles)
 endif()
 
 if(NOT TARGET UpdateTxFile)
+  file(WRITE ${CMAKE_BINARY_DIR}/tx/_updateTxFile.sh
+        "echo '[main]'\n"
+        "echo 'host = https://www.transifex.com'\n"
+        "echo 'minimum_perc = 5'\n"
+        "echo ''\n"
+        "for f in `ls ${CMAKE_BINARY_DIR}/tx/*.tx.sh`; do\n"
+        " sh $f;\n"
+        "done\n"
+      )
+
   add_custom_target(UpdateTxFile  
-    COMMAND echo "[main]"                            > ${CMAKE_SOURCE_DIR}/.tx/config2
-    COMMAND echo "host = https://www.transifex.net" >> ${CMAKE_SOURCE_DIR}/.tx/config2
-    COMMAND echo ""                                 >> ${CMAKE_SOURCE_DIR}/.tx/config2
-    COMMAND cat ${CMAKE_BINARY_DIR}/tx/*.tx_config  >> ${CMAKE_SOURCE_DIR}/.tx/config2
+    COMMAND sh ${CMAKE_BINARY_DIR}/tx/_updateTxFile.sh > ${CMAKE_SOURCE_DIR}/.tx/config
   )
 endif()
 
@@ -127,17 +134,18 @@ function(razor_translate_ts _qmFiles)
     add_dependencies(UpdateTsFiles Update_${_tsSrcFileName})
     
     # TX file ***********************************************
-    set(_txFile "${CMAKE_BINARY_DIR}/tx/${_tsSrcFileName}.tx_config")  
+    set(_txFile "${CMAKE_BINARY_DIR}/tx/${_tsSrcFileName}.tx.sh")
     string(REPLACE "${CMAKE_SOURCE_DIR}/" "" _tx_translationDir ${_translationDir})
     string(REPLACE "${CMAKE_SOURCE_DIR}/" "" _tx_tsSrcFile ${_tsSrcFile})
     
     file(WRITE ${_txFile}
-        "[razor-qt.${_tsSrcFileNameWE}]\n"
-        "type = QT\n"
-        "source_lang = en\n"
-        "source_file = ${_tx_tsSrcFile}\n"
-        "file_filter = ${_tx_translationDir}/${_tsSrcFileNameWE}_<lang>.ts\n"
-        "\n"
+        "[ -f ${_tsSrcFile} ] || exit 0\n"
+        "echo '[razor-qt.${_tsSrcFileNameWE}]'\n"
+        "echo 'type = QT'\n"
+        "echo 'source_lang = en'\n"
+        "echo 'source_file = ${_tx_tsSrcFile}'\n"
+        "echo 'file_filter = ${_tx_translationDir}/${_tsSrcFileNameWE}_<lang>.ts'\n"
+        "echo ''\n"
     )
 
     # translate.h file *************************************
@@ -179,7 +187,7 @@ endfunction(razor_translate_ts)
 # DESCTOP files
 #**********************************************************
 
-function(razor_translate_desktop2 _RESULT)
+function(razor_translate_desktop _RESULT)
     set(_translationDir "translations")
     
     # Parse arguments ***************************************
@@ -244,103 +252,22 @@ function(razor_translate_desktop2 _RESULT)
 
 
         # TX file ***********************************************
-        set(_txFile "${CMAKE_BINARY_DIR}/tx/${_fileName}${_fileExt}.tx_config")  
+        set(_txFile "${CMAKE_BINARY_DIR}/tx/${_fileName}${_fileExt}.tx.sh")
         string(REPLACE "${CMAKE_SOURCE_DIR}/" "" _tx_translationDir ${_translationDir})
         string(REPLACE "${CMAKE_SOURCE_DIR}/" "" _tx_inFile ${_inFile})
     
         file(WRITE ${_txFile}
-            "[razor-qt.${_fileName}_desktop]\n"
-            "type = DESKTOP\n"
-            "source_lang = en\n"
-            "source_file = ${_tx_inFile}\n"
-            "file_filter = ${_tx_translationDir}/${_fileName}_<lang>${_fileExt}\n"
-            "\n"
+            "[ -f ${_inFile} ] || exit 0\n"
+            "echo '[razor-qt.${_fileName}_desktop]'\n"
+            "echo 'type = DESKTOP'\n"
+            "echo 'source_lang = en'\n"
+            "echo 'source_file = ${_tx_inFile}'\n"
+            "echo 'file_filter = ${_tx_translationDir}/${_fileName}_<lang>${_fileExt}'\n"
+            "echo ''\n"
         )
 
     endforeach()
 
     set(${_RESULT} ${__result} PARENT_SCOPE)    
-endfunction(razor_translate_desktop2)
-
-
-
-
-
-#**********************************************************
-# TS files
-#**********************************************************
-
-macro(razor_translate_to _QM_FILES _TRANSLATIONS_DIR)
-    file(GLOB TS_FILES
-        translations/*.ts
-        translations/local/*.ts
-    )
-
-    set(TRANSLATIONS_DIR ${_TRANSLATIONS_DIR})
-    add_definitions(-DTRANSLATIONS_DIR=\"${TRANSLATIONS_DIR}\")
-    QT4_ADD_TRANSLATION_FIXED(${_QM_FILES} ${TS_FILES})
-
-    install(FILES ${${_QM_FILES}} DESTINATION ${TRANSLATIONS_DIR})
-
-    configure_file(${CMAKE_MODULE_PATH}/razortranslate.h.in razortranslate.h)
-    include_directories(${CMAKE_CURRENT_BINARY_DIR})
-endmacro(razor_translate_to)
-
-
-macro(razor_translate _QM_FILES)
-    razor_translate_to(${_QM_FILES} ${CMAKE_INSTALL_PREFIX}/share/razor/${PROJECT_NAME})
-endmacro(razor_translate)
-
-
-#**********************************************************
-# DESCTOP files
-#**********************************************************
-
-macro(razor_translate_desktop _RESULT)
-  foreach (_current_FILE ${ARGN})
-    get_filename_component(_IN_FILE ${_current_FILE} ABSOLUTE)
-    get_filename_component(_FILE_NAME ${_IN_FILE} NAME_WE)
-    #Extract real extension ................
-    get_filename_component(_FILE_EXT ${_IN_FILE} EXT)
-    string(REPLACE ".in" "" _FILE_EXT ${_FILE_EXT})
-    #.......................................
-    set(_OUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${_FILE_NAME}${_FILE_EXT}")
-
-
-    file(GLOB TR_FILES
-        translations/${_FILE_NAME}_*${_FILE_EXT}
-        translations/local/${_FILE_NAME}_*${_FILE_EXT}
-    )
-
-    #if (NOT TR_FILES)
-    #    message(WARNING "Translations files not found for ${_current_FILE}")
-    #endif()
-
-    #message(status ".:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:")
-    #message(status "EXT ${_FILE_EXT}")
-    #message(status "IN:     ${_IN_FILE}")
-    #message(status "OUT:    ${_OUT_FILE}")
-    #message(status "TR Dir: ${CMAKE_CURRENT_SOURCE_DIR}")
-    #message(status "TR:  ${TR_FILES}")
-    #message(status ".:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:")
-
-    set(PATTERN "'\\[.*]\\s*='")
-    if (TR_FILES)
-        add_custom_command(OUTPUT ${_OUT_FILE}
-            COMMAND grep -v "'#TRANSLATIONS_DIR='" ${_IN_FILE} > ${_OUT_FILE}
-            COMMAND grep --no-filename ${PATTERN} ${TR_FILES} >> ${_OUT_FILE}
-            COMMENT "Generating ${_FILE_NAME}${_FILE_EXT}"
-        )
-    else()
-        add_custom_command(OUTPUT ${_OUT_FILE}
-            COMMAND grep -v "'#TRANSLATIONS_DIR='" ${_IN_FILE} > ${_OUT_FILE}
-            COMMENT "Generating ${_FILE_NAME}${_FILE_EXT}"
-        )
-    endif()
-
-    set(${_RESULT} ${${_RESULT}} ${_OUT_FILE})
-  endforeach(_current_FILE)
-endmacro(razor_translate_desktop)
-
-
+endfunction(razor_translate_desktop)
 

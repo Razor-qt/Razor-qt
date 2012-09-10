@@ -57,7 +57,7 @@ razor_translate_ts(QM_FILES
         ${razor-config-mouse_UIS}
 )
 
-razor_translate_desktop2(DESKTOP_FILES
+razor_translate_desktop(DESKTOP_FILES
     SOURCES
         razor-config-mouse.desktop.in
 )
@@ -66,7 +66,7 @@ razor_translate_desktop2(DESKTOP_FILES
 add_executable ( razor-config-mouse ${razor-config-mouse_SRCS} ${razor-config-mouse_CXX} ${razor-config-mouse_MOCS} ${DESKTOP_FILES} ${QM_FILES})
 add_dependencies( razor-config-mouse razorqt qtxdg)
 target_link_libraries ( razor-config-mouse  ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY} ${QT_QTXML_LIBRARY}
-                                                 ${X11_X11_LIB} ${X11_Xcursor_LIB} razorqt ${ZLIB_LIBRARY} ${X11_Xfixes_LIB})
+                                                 ${X11_X11_LIB} ${X11_Xcursor_LIB} razorqt qtxdg ${ZLIB_LIBRARY} ${X11_Xfixes_LIB})
 # not needed probably ${X11_Xfixes_LIB})
 
 INSTALL(TARGETS razor-config-mouse RUNTIME DESTINATION bin)
