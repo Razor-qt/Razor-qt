@@ -48,7 +48,11 @@ public:
         : QDBusAbstractAdaptor(manager),
           m_manager(manager)
     {
+        connect(m_manager, SIGNAL(moduleStateChanged(QString,bool)), SIGNAL(moduleStateChanged(QString,bool)));
     }
+
+signals:
+    void moduleStateChanged(QString moduleName, bool state);
 
 public slots:
 
@@ -62,6 +66,21 @@ public slots:
     Q_NOREPLY void logout()
     {
         m_manager->logout();
+    }
+
+    QDBusVariant listModules()
+    {
+        return QDBusVariant(m_manager->listModules());
+    }
+
+    Q_NOREPLY void startModule(const QString& name)
+    {
+        m_manager->startProcess(name);
+    }
+
+    Q_NOREPLY void stopModule(const QString& name)
+    {
+        m_manager->stopProcess(name);
     }
 
 private:

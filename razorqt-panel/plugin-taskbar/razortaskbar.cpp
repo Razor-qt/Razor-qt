@@ -362,6 +362,7 @@ void RazorTaskBar::settingsChanged()
 
     mShowOnlyCurrentDesktopTasks = settings().value("showOnlyCurrentDesktopTasks", mShowOnlyCurrentDesktopTasks).toBool();
     RazorTaskButton::setShowOnlyCurrentDesktopTasks(mShowOnlyCurrentDesktopTasks);
+    RazorTaskButton::setCloseOnMiddleClick(settings().value("closeOnMiddleClick", true).toBool());
     refreshTaskList();
 }
 

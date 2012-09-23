@@ -3,7 +3,7 @@ razorqt for Debian
 
 Now razorqt are more close to 0.5 release and new symbols will be in library, 
 so a possible SONAME update will appear in next release that means the older 
-installed libraries dont work with newer razor modules.
+installed libraries don't work with newer razor modules.
 
 Panel plugin has new volume control at very early stage. Works with alsa and pulseaudio, 
 current status of plugins its in early stage and work only by runtime build default 
@@ -21,6 +21,11 @@ current razorqt desktop installed and also techical info about razorqt instalati
 Theres a new item, razor-openssh-askpass, this module are very early stage, 
 and not enabled by default, so u must added a env in razor-settings SSH_ASKPASS= 
 with razor-openssh-askpass value, openssl and openssh-client packages must be required.
+
+%ifnot RELEASE lucid maverick lenny etch squeeze
+Now razorqt are multiarch capable. Since new release 0.5.0 builds are automaticaly.
+For multiarch info see wiki info debian multiarch http://wiki.debian.org/Multiarch/
+%endif
 
  -- PICCORO Lenz McKAY <mckaygerhard@gmail.com>  Wed, 11 Jul 2012 14:23:40 -0430
 

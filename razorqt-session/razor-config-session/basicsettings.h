@@ -31,6 +31,8 @@
 #include <QtGui/QWidget>
 #include <razorqt/razorsettings.h>
 
+#include "modulemodel.h"
+
 namespace Ui {
 class BasicSettings;
 }
@@ -52,11 +54,13 @@ public slots:
 
 private:
     RazorSettings* m_settings;
+    ModuleModel* m_moduleModel;
     Ui::BasicSettings* ui;
 
 private slots:
     void findWmButton_clicked();
-
+    void startButton_clicked();
+    void stopButton_clicked();
 };
 
 #endif // BASICSETTINGS_H

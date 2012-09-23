@@ -34,6 +34,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtGui/QMessageBox>
 #include <QtGui/QSystemTrayIcon>
+#include <QtCore/QFileInfo>
 #include "wmselectdialog.h"
 #include <razorqt/xfitman.h>
 #include "windowmanager.h"
@@ -46,7 +47,8 @@
  */
 RazorModuleManager::RazorModuleManager(const QString & config, const QString & windowManager, QObject* parent)
     : QObject(parent),
-    mConfig(config)
+      mConfig(config),
+      mWmProcess(new QProcess(this))
 {
     qDebug() << __FILE__ << ":" << __LINE__ << "Session" << config << "about to launch (deafult 'session')";
     if (mConfig.isEmpty())
@@ -92,10 +94,7 @@ RazorModuleManager::RazorModuleManager(const QString & config, const QString & w
             //qDebug() << "Using window manager specified with command line" << windowManager;
         }
 
-        QProcess * wmProcess = new QProcess(this);
-        wmProcess->start(wm);
-        connect(wmProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-                this, SLOT(logout()));
+        mWmProcess->start(wm);
 
         // Wait until the WM loads
         int waitCnt = 300;
@@ -154,22 +153,47 @@ void RazorModuleManager::startProcess(const XdgDesktopFile& file)
         qWarning() << "Wrong desktop file" << file.fileName();
         return;
     }
-    QString command = args.takeFirst();
-    QProcess* proc = new QProcess(this);
-    proc->start(command, args);
+    RazorModule* proc = new RazorModule(file, this);
+    connect(proc, SIGNAL(moduleStateChanged(QString,bool)), this, SIGNAL(moduleStateChanged(QString,bool)));
+    proc->start();
 
-    mProcMap[proc] = new XdgDesktopFile(file);
+    QString name = QFileInfo(file.fileName()).fileName();
+    mNameMap[name] = proc;
 
     connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(restartModules(int, QProcess::ExitStatus)));
 }
 
+void RazorModuleManager::startProcess(const QString& name)
+{
+    if (!mNameMap.contains(name))
+    {
+        foreach (const XdgDesktopFile& file, XdgAutoStart::desktopFileList(false))
+        {
+            if (QFileInfo(file.fileName()).fileName() == name)
+            {
+                startProcess(file);
+                return;
+            }
+        }
+    }
+}
+
+void RazorModuleManager::stopProcess(const QString& name)
+{
+    if (mNameMap.contains(name))
+        mNameMap[name]->terminate();
+}
+
+QStringList RazorModuleManager::listModules() const
+{
+    return QStringList(mNameMap.keys());
+}
+
 void RazorModuleManager::startConfUpdate()
 {
-    XdgDesktopFile desktop;
-    desktop.setValue("Type", "Application");
+    XdgDesktopFile desktop(XdgDesktopFile::ApplicationType, ":razor-confupdate", "razor-confupdate --watch");
     desktop.setValue("Name", "Razor config updater");
-    desktop.setValue("Exec", "razor-confupdate --watch");
     desktop.setValue("X-Razor-Module", true);
     startProcess(desktop);
 }
@@ -177,44 +201,47 @@ void RazorModuleManager::startConfUpdate()
 void RazorModuleManager::restartModules(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug() << "void RazorModuleManager::restartModules() called and it's wrong. Something is failing" << sender();
-    QProcess * proc = qobject_cast<QProcess*>(sender());
+    RazorModule* proc = qobject_cast<RazorModule*>(sender());
     Q_ASSERT(proc);
-    XdgDesktopFile* procFile = mProcMap[proc];
-    QString procName = procFile->name();
 
-    switch (exitStatus)
+    if (!proc->isTerminating())
     {
-        case QProcess::NormalExit:
-            qDebug() << "Process" << procName << "(" << proc << ") exited correctly.";
-            break;
-        case QProcess::CrashExit:
+        QString procName = proc->file.name();
+        switch (exitStatus)
         {
-            qDebug() << "Process" << procName << "(" << proc << ") has to be restarted";
-            if (!m_crashReport.contains(proc))
-                m_crashReport[proc] = 0;
-            int stat = m_crashReport[proc]++;
-            if (stat >= MAX_CRASHES_PER_APP)
+            case QProcess::NormalExit:
+                qDebug() << "Process" << procName << "(" << proc << ") exited correctly.";
+                break;
+            case QProcess::CrashExit:
             {
-                QMessageBox::warning(0, tr("Razor Session Crash Report"),
-                                    tr("Application '%1' crashed too many times. Its autorestart has been disabled for current session.").arg(procName));
-                delete mProcMap.take(proc);
-                proc->deleteLater();
+                qDebug() << "Process" << procName << "(" << proc << ") has to be restarted";
+                if (!m_crashReport.contains(proc))
+                    m_crashReport[proc] = 0;
+                int stat = m_crashReport[proc]++;
+                if (stat >= MAX_CRASHES_PER_APP)
+                {
+                    QMessageBox::warning(0, tr("Razor Session Crash Report"),
+                                        tr("Application '%1' crashed too many times. Its autorestart has been disabled for current session.").arg(procName));
+
+                }
+                else
+                {
+                    proc->start();
+                    return;
+                }
+                break;
             }
-            else
-            {
-                QStringList args = procFile->expandExecString();
-                QString command = args.takeFirst();
-                proc->start(command, args);
-            }
-            break;
         }
     }
+    mNameMap.remove(proc->fileName);
+    proc->deleteLater();
 }
 
 
 RazorModuleManager::~RazorModuleManager()
 {
-    qDeleteAll(mProcMap);
+    qDeleteAll(mNameMap);
+    delete mWmProcess;
 }
 
 /**
@@ -223,17 +250,33 @@ RazorModuleManager::~RazorModuleManager()
 void RazorModuleManager::logout()
 {
     // modules
-    ModulesMapIterator i(mProcMap);
+    ModulesMapIterator i(mNameMap);
     while (i.hasNext())
     {
         i.next();
         qDebug() << "Module logout" << i.key();
-        QProcess * p = i.key();
-        p->blockSignals(true);
+        RazorModule* p = i.value();
         p->terminate();
-        if (!p->waitForFinished())
-            qDebug() << "Module" << p << "rejected to close correctly. Kill it down.";
     }
+    i.toFront();
+    while (i.hasNext())
+    {
+        i.next();
+        RazorModule* p = i.value();
+        if (p->state() != QProcess::NotRunning && !p->waitForFinished())
+        {
+            qWarning() << QString("Module '%1' won't terminate ... killing.").arg(i.key());
+            p->kill();
+        }
+    }
+
+    mWmProcess->terminate();
+    if (mWmProcess->state() != QProcess::NotRunning && !mWmProcess->waitForFinished())
+    {
+        qWarning() << QString("Window Manager won't terminate ... killing.");
+        mWmProcess->kill();
+    }
+
     QCoreApplication::exit(0);
 }
 
@@ -280,3 +323,35 @@ void razor_setenv_prepend(const char *env, const QByteArray &value, const QByteA
     razor_setenv(env, orig);
 }
 
+RazorModule::RazorModule(const XdgDesktopFile& file, QObject* parent) :
+    QProcess(parent),
+    file(file),
+    fileName(QFileInfo(file.fileName()).fileName())
+{
+    connect(this, SIGNAL(stateChanged(QProcess::ProcessState)), SLOT(updateState(QProcess::ProcessState)));
+}
+
+void RazorModule::start()
+{
+    mIsTerminating = false;
+    QStringList args = file.expandExecString();
+    QString command = args.takeFirst();
+    QProcess::start(command, args);
+}
+
+void RazorModule::terminate()
+{
+    mIsTerminating = true;
+    QProcess::terminate();
+}
+
+bool RazorModule::isTerminating()
+{
+    return mIsTerminating;
+}
+
+void RazorModule::updateState(QProcess::ProcessState newState)
+{
+    if (newState != QProcess::Starting)
+        emit moduleStateChanged(fileName, (newState == QProcess::Running));
+}

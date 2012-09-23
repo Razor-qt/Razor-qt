@@ -9,6 +9,10 @@
 /usr/share/xsessions/
 /usr/share/apps/kdm/sessions/
 /etc/xdg/autostart/*
-/usr/share/razor/razor-confupdate/razor-0.5.upd
+/usr/share/razor/razor-confupdate/*
 /usr/bin/razor-confupdate
-/usr/lib/razor-confupdate_bin/sesion_modules
+%if MULTIARCH yes
+/usr/lib/*/razor-confupdate_bin/sesion_modules
+%else
+/usr/lib*/razor-confupdate_bin/sesion_modules
+%endif

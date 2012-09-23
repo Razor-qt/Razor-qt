@@ -42,9 +42,11 @@ IconView::IconView(DesktopScene * scene, const QString & configId, RazorSettings
 {
     m_proxy = new QGraphicsProxyWidget(this);
     m_widget = new IconViewWidget(configId, config);
-    m_widget->show();
     m_proxy->setWidget(m_widget);
     m_proxy->show();
+
+    connect(this, SIGNAL(pluginResized(QSizeF)),
+            m_widget, SLOT(setSize(QSizeF)));
 }
 
 QString IconView::info()
@@ -60,7 +62,7 @@ QString IconView::instanceInfo()
 void IconView::setSizeAndPosition(const QPointF & position, const QSizeF & size)
 {
     DesktopWidgetPlugin::setSizeAndPosition(position, size);
-    m_widget->setSizeAndPosition(position, size);
+    m_widget->setSize(size);
 }
 
 void IconView::save()
@@ -94,8 +96,7 @@ IconViewWidget::IconViewWidget(const QString & configId, RazorSettings * config)
 
     config->beginGroup(configId);
 
-    QString dir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-    dir = config->value("directory", dir).toString();
+    QString dir = config->value("directory").toString();
     config->endGroup();
 
     // Hack to ensure the fully transparent QGraphicsView background
@@ -132,7 +133,7 @@ IconViewWidget::~IconViewWidget()
     delete m_iconScene;
 }
 
-void IconViewWidget::setSizeAndPosition(const QPointF & position, const QSizeF & size)
+void IconViewWidget::setSize(const QSizeF & size)
 {
     m_iconScene->setParentSize(size);
     resize(size.width(), size.height());

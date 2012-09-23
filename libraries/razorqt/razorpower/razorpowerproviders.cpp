@@ -29,9 +29,9 @@
 
 #include "razorpowerproviders.h"
 #include <QtDBus/QDBusInterface>
+#include <QtCore/QProcess>
 #include <QtCore/QDebug>
 #include "razorqt/razornotification.h"
-#include "razorqt/xfitman.h"
 
 #define UPOWER_SERVICE          "org.freedesktop.UPower"
 #define UPOWER_PATH             "/org/freedesktop/UPower"
@@ -80,7 +80,7 @@ bool dbusCall(const QString &service,
         {
             RazorNotification::notify(
                                     QObject::tr("Power Manager Error"),
-                                    QObject::tr("QDBusInterface is invalid")+ "<p>" + service +" " + path +" " + interface +" " + method,
+                                    QObject::tr("QDBusInterface is invalid")+ "\n\n" + service + " " + path + " " + interface + " " + method,
                                     "razor-logo.png");
         }
         return false;
@@ -95,7 +95,7 @@ bool dbusCall(const QString &service,
         {
             RazorNotification::notify(
                                     QObject::tr("Power Manager Error (D-BUS call)"),
-                                    msg.errorName() + "<p>" + msg.errorMessage(),
+                                    msg.errorName() + "\n\n" + msg.errorMessage(),
                                     "razor-logo.png");
         }
     }
@@ -123,7 +123,7 @@ bool dbusGetProperty(const QString &service,
 //        RazorNotification::notify(QObject::tr("Razor Power Manager"),
 //                                  "razor-logo.png",
 //                                  QObject::tr("Power Manager Error"),
-//                                  QObject::tr("QDBusInterface is invalid")+ "<p>" + service +" " + path +" " + interface +" " + property);
+//                                  QObject::tr("QDBusInterface is invalid")+ "\n\n" + service +" " + path +" " + interface +" " + property);
 
         return false;
     }
@@ -136,7 +136,7 @@ bool dbusGetProperty(const QString &service,
 //        RazorNotification::notify(QObject::tr("Razor Power Manager"),
 //                                  "razor-logo.png",
 //                                  QObject::tr("Power Manager Error (Get Property)"),
-//                                  msg.errorName() + "<p>" + msg.errorMessage());
+//                                  msg.errorName() + "\n\n" + msg.errorMessage());
     }
 
     return !msg.arguments().isEmpty() &&
@@ -208,7 +208,11 @@ bool UPowerProvider::canAction(RazorPower::Action action) const
                 UPOWER_PATH,
                 UPOWER_INTERFACE,
                 QDBusConnection::systemBus(),
-                command
+                command,
+                // canAction should be always silent because it can freeze
+                // g_main_context_iteration Qt event loop in QMessageBox
+                // on panel startup if there is no DBUS running.
+                RazorPowerProvider::DontCheckDBUS
             );
 }
 
@@ -277,7 +281,11 @@ bool ConsoleKitProvider::canAction(RazorPower::Action action) const
                     CONSOLEKIT_PATH,
                     CONSOLEKIT_INTERFACE,
                     QDBusConnection::systemBus(),
-                    command
+                    command,
+                    // canAction should be always silent because it can freeze
+                    // g_main_context_iteration Qt event loop in QMessageBox
+                    // on panel startup if there is no DBUS running.
+                    RazorPowerProvider::DontCheckDBUS
                    );
 }
 
@@ -331,7 +339,8 @@ bool RazorProvider::canAction(RazorPower::Action action) const
         case RazorPower::PowerLogout:
             // there can be case when razo-session does not run
             return dbusCall(RAZOR_SERVICE, RAZOR_PATH, RAZOR_SERVICE,
-                            QDBusConnection::sessionBus(), "canLogout", RazorPowerProvider::DontCheckDBUS);
+                            QDBusConnection::sessionBus(), "canLogout",
+                            RazorPowerProvider::DontCheckDBUS);
         default:
             return false;
     }
@@ -385,4 +394,75 @@ bool HalProvider::canAction(RazorPower::Action action) const
 bool HalProvider::doAction(RazorPower::Action action)
 {
     return false;
+}
+
+
+/************************************************
+  CustomProvider
+ ************************************************/
+CustomProvider::CustomProvider(QObject *parent):
+    RazorPowerProvider(parent),
+    mSettings("power")
+{
+}
+
+CustomProvider::~CustomProvider()
+{
+}
+
+bool CustomProvider::canAction(RazorPower::Action action) const
+{
+    switch (action)
+    {
+    case RazorPower::PowerShutdown:
+        return mSettings.contains("shutdownCommand");
+
+    case RazorPower::PowerReboot:
+        return mSettings.contains("rebootCommand");
+
+    case RazorPower::PowerHibernate:
+        return mSettings.contains("hibernateCommand");
+
+    case RazorPower::PowerSuspend:
+        return mSettings.contains("suspendCommand");
+
+    case RazorPower::PowerLogout:
+        return mSettings.contains("logoutCommand");
+
+    default:
+        return false;
+    }
+}
+
+bool CustomProvider::doAction(RazorPower::Action action)
+{
+    QString command;
+
+    switch(action)
+    {
+    case RazorPower::PowerShutdown:
+        command = mSettings.value("shutdownCommand").toString();
+        break;
+
+    case RazorPower::PowerReboot:
+        command = mSettings.value("rebootCommand").toString();
+        break;
+
+    case RazorPower::PowerHibernate:
+        command = mSettings.value("hibernateCommand").toString();
+        break;
+
+    case RazorPower::PowerSuspend:
+        command = mSettings.value("suspendCommand").toString();
+        break;
+
+    case RazorPower::PowerLogout:
+        command = mSettings.value("logoutCommand").toString();
+        break;
+
+    default:
+        return false;
+    }
+
+    return QProcess::startDetached(command);
 }

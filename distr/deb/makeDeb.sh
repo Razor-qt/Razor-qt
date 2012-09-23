@@ -14,6 +14,7 @@ Options
   --ver=VERSION         razor version
   -S|--sign             sign a result files
   -s|--source           build a source package, if ommited build a binary package
+  --debug               debug mode not build package only create debian directory
 HELP_TEXT
 }
 
@@ -21,16 +22,22 @@ HELP_TEXT
 
 VARIABLES=""
 
+function debug
+{
+    [ -n "$DEBUG" ] && echo $@ >&2
+}
+
 function setVariable
 {
     VARIABLES="${VARIABLES}$2=$3\n"
+    debug "set variable: $2 = $3"
+    debug "variables $VARIABLES"
 }
 
 function getVariable
 {
-    printf $VARIABLES | awk -F'=' "/${1}=/ {print(\$2)}"
+    printf "$VARIABLES" | awk -F'=' "/${1}=/ {print(\$2)}"
 }
-
 
 function checkIf
 {
@@ -219,6 +226,11 @@ while [ $# -gt 0 ]; do
         shift
       ;;
 
+    --debug)
+        DEBUG=1
+        shift
+      ;;
+
     --)
         shift
         break
@@ -284,11 +296,16 @@ if [ -z "$DEBEMAIL" ]; then
   DEBEMAIL=${EMAIL}
 fi
 
+if [ -n "$DEBUG" ]; then
+  TYPE="Debug"
+fi
+
 echo "*******************************"
 echo " Name: ${NAME}"
 echo " Ver:  ${VER}"
-[ "${TYPE}" = "-b" ] && echo " Type: binary"
-[ "${TYPE}" = "-S" ] && echo " Type: source"
+[ "${TYPE}" = "-b"    ] && echo " Type: binary"
+[ "${TYPE}" = "-S"    ] && echo " Type: source"
+[ "${TYPE}" = "Debug" ] && echo " Type: debug"
 echo " Distrib: ${DISTRIB}"
 echo " Release: ${RELEASE}"
 echo " Src dir: ${SRC_DIR}"
@@ -301,11 +318,16 @@ mkdir -p ${OUT_DIR} || exit 2
 DIR=${OUT_DIR}/${NAME}-${VER}
 rm -rf ${DIR}
 
-cp -r ${SRC_DIR} ${DIR}
-rm -rf ${DIR}/.git \
-       ${DIR}/build
+if [ -z "$DEBUG" ]; then
+  cp -r ${SRC_DIR} ${DIR}
+  rm -rf ${DIR}/.git \
+         ${DIR}/build
 
-cd ${DIR}/.. && tar cjf ${NAME}_${VER}.orig.tar.bz2 ${NAME}-${VER}
+  cd ${DIR}/.. && tar cjf ${NAME}_${VER}.orig.tar.bz2 ${NAME}-${VER}
+else
+  mkdir -p ${DIR}/distr
+  cp -r ${SRC_DIR}/distr/ ${DIR}
+fi
 
 for RELEASE in ${RELEASE}; do
     # Debin directory .....................
@@ -313,14 +335,23 @@ for RELEASE in ${RELEASE}; do
     mkdir -p ${DIR}/debian
     mkdir -p ${DIR}/debian/source
     DATE=`date -R`
-    for src in `find ${DIR}/distr/deb/debian -type f `; do
-        dest=`echo $src | sed -e's|/distr/deb||'`
 
+    prepareFile ${DIR}/distr/deb/debian/control > ${DIR}/debian/control
+
+    for src in `find ${DIR}/distr/deb/debian -type f \! -name "control"`; do
+        dest=`echo $src | sed -e's|/distr/deb||'`
         prepareFile "${src}" > ${dest}
         chmod --reference "${src}" ${dest}
     done
     # Debin directory .....................
-    cd ${DIR} && debuild ${TYPE} ${SIGN} -rfakeroot
+
+    if [ -z "$DEBUG" ]; then
+      cd ${DIR} && debuild ${TYPE} ${SIGN} -rfakeroot
+      ret=$?
+      [ $ret -eq 0 ] || exit $ret
+    else
+      exit
+    fi
 done
 
 if [ "${TYPE}" = '-b' ]; then

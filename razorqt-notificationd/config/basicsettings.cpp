@@ -95,16 +95,12 @@ void BasicSettings::save()
         mSettings->setValue("placement", "top-right");
     else if (topLeftButton->isChecked())
         mSettings->setValue("placement", "top-left");
-
-    mSettings->sync();
-
-    serverReloadSettings();
 }
 
 void BasicSettings::testNotification()
 {
     RazorNotification::notify(//"razor-config-notificationd",
                               tr("Notification Summary"),
-                              tr("Notification Body") + "<p>Lorem ipsim dolor sir amet...",
+                              tr("Notification Body") + "\n\nLorem ipsum dolor sit amet...",
                               "razor-logo.png");
 }
