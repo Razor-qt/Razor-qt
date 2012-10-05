@@ -50,6 +50,7 @@
 #include <qtxdg/xdgdirs.h>
 #include <QtGui/QWidgetAction>
 #include <QtGui/QToolButton>
+#include <QPropertyAnimation>
 
 
 
@@ -102,7 +103,6 @@ RazorPanel::RazorPanel(QWidget *parent) :
 
     setObjectName("RazorPanel");
 }
-
 
 /************************************************
 
@@ -163,6 +163,8 @@ void RazorPanelPrivate::init()
     mWidthInPercents = mSettings->value(CFG_KEY_PERCENT, true).toBool();
     mWidth = mSettings->value(CFG_KEY_WIDTH, 100).toInt();
     mUseThemeSize = mSettings->value(CFG_KEY_AUTOSIZE, true).toBool();
+    mAutoHideSpeed = mSettings->value(CFG_KEY_AUTOHIDE_SPEED,(KEY_AUTOHIDE_SPEED_MAX + KEY_AUTOHIDE_SPEED_MIN)/2).toInt();
+    mUseAutoHide = mSettings->value(CFG_KEY_AUTOHIDE,false).toBool();
     mSettings->endGroup();
 
     q->setLayout(mLayout);
@@ -420,6 +422,13 @@ void RazorPanelPrivate::realign()
     Window wid = q->effectiveWinId();
     QRect desktop = QApplication::desktop()->screen(mScreenNum)->geometry();
 
+
+    if (mUseAutoHide==true){
+        rect.setTop(0);
+        rect.setBottom(0);
+        rect.setLeft(0);
+        rect.setRight(0);
+    }
     switch (mPosition)
     {
         case RazorPanel::PositionTop:
@@ -587,8 +596,8 @@ void RazorPanelPrivate::showConfigPanelDialog()
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, SIGNAL(reset()), page, SLOT(reset()));
     connect(dlg, SIGNAL(save()), page, SLOT(save()));
-    connect(page, SIGNAL(configChanged(int, int, bool, RazorPanel::Alignment, bool)),
-                      SLOT(updateSize(int, int, bool, RazorPanel::Alignment, bool)));
+    connect(page, SIGNAL(configChanged(int, int, bool, RazorPanel::Alignment, bool, bool, int)),
+                      SLOT(updateSize(int, int, bool, RazorPanel::Alignment, bool, bool, int)));
     connect(page, SIGNAL(positionChanged(int, RazorPanel::Position)), SLOT(switchPosition(int, RazorPanel::Position)));
     dlg->show();
 }
@@ -597,16 +606,21 @@ void RazorPanelPrivate::showConfigPanelDialog()
 /************************************************
 
  ************************************************/
-void RazorPanelPrivate::updateSize(int height, int width, bool percent, RazorPanel::Alignment alignment, bool useThemeSize)
+void RazorPanelPrivate::updateSize(int height, int width, bool percent, RazorPanel::Alignment alignment, bool useThemeSize, bool useAutoHie, int autoHideSpeed)
 {
     mHeight = height;
     mWidth = width;
     mWidthInPercents = percent;
     mAlignment = alignment;    
     mUseThemeSize = useThemeSize;
+    mUseAutoHide=useAutoHie;
+    mAutoHideSpeed=autoHideSpeed;
 
     updatePluginsMinSize();
     realign();
+
+    Q_Q(RazorPanel);
+    q->leaveEvent(NULL);
 }
 
 /************************************************
@@ -686,6 +700,10 @@ void RazorPanelPrivate::addPlugin(const RazorPluginInfo &pluginInfo)
 void RazorPanel::show()
 {
     Q_D(RazorPanel);
+
+    if(d->mUseAutoHide==true)
+        leaveEvent(NULL);
+        //setGeometry(QRect(this->x(), QApplication::desktop()->height()-1, this->width(), this->height()));
     QWidget::show();
     d->reposition();
     xfitMan().moveWindowToDesktop(this->effectiveWinId(), -1);
@@ -931,6 +949,70 @@ void RazorPanelPrivate::reposition()
     }
 
     realign();
+}
+
+/************************************************
+
+ ************************************************/
+void RazorPanel::leaveEvent(QEvent *e){
+
+    Q_D(RazorPanel);
+    if(d->mUseAutoHide==false)
+        return;
+
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
+    animation->setDuration(d->mAutoHideSpeed);
+    animation->setStartValue(QRect(this->x(), this->y(), this->width(), this->height()));
+
+    switch (d->mPosition)
+    {
+    case RazorPanel::PositionBottom:
+        animation->setEndValue(QRect(this->x(), QApplication::desktop()->height()-1, this->width(), this->height()));
+        break;
+    case RazorPanel::PositionLeft:
+        animation->setEndValue(QRect(-this->width()+1, this->y(), this->width(), this->height()));
+        break;
+    case RazorPanel::PositionRight:
+        animation->setEndValue(QRect(QApplication::desktop()->width()-1, this->y(), this->width(), this->height()));
+        break;
+    case RazorPanel::PositionTop:
+        animation->setEndValue(QRect(this->x(), -this->height()+1, this->width(), this->height()));
+        break;
+    }
+
+    animation->start();
+}
+
+/************************************************
+
+ ************************************************/
+void RazorPanel::enterEvent(QEvent *e){
+
+    Q_D(RazorPanel);
+    if(d->mUseAutoHide==false)
+        return;
+
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
+    animation->setDuration(d->mAutoHideSpeed);
+    animation->setStartValue(QRect(this->x(), this->y(), this->width(), this->height()));
+
+    switch (d->mPosition)
+    {
+    case RazorPanel::PositionBottom:
+        animation->setEndValue(QRect(this->x(), QApplication::desktop()->height()-this->height(), this->width(), this->height()));
+        break;
+    case RazorPanel::PositionLeft:
+        animation->setEndValue(QRect(0, this->y(), this->width(), this->height()));
+        break;
+    case RazorPanel::PositionRight:
+        animation->setEndValue(QRect(QApplication::desktop()->width()-this->width(), this->y(), this->width(), this->height()));
+        break;
+    case RazorPanel::PositionTop:
+        animation->setEndValue(QRect(this->x(),0,this->width(), this->height()));
+        break;
+    }
+
+    animation->start();
 }
 
 

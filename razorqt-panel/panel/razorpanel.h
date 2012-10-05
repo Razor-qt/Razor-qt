@@ -87,6 +87,8 @@ signals:
     
 protected:
     virtual bool event(QEvent* e);
+    void leaveEvent(QEvent* e);
+    void enterEvent(QEvent* e);
 
 private:
     RazorPanelPrivate* const d_ptr;
