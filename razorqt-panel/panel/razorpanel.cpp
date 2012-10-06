@@ -424,15 +424,15 @@ void RazorPanelPrivate::realign()
 
 
     if (mUseAutoHide==true){
-        rect.setTop(0);
-        rect.setBottom(0);
-        rect.setLeft(0);
-        rect.setRight(0);
+        xf.setStrut(wid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        emit q->panelRealigned();
+        return;
     }
+
     switch (mPosition)
     {
         case RazorPanel::PositionTop:
-            xf.setStrut(wid, 0, 0, q->height(), 0,
+            xf.setStrut(wid,  0, 0, q->height(), 0,
                /* Left   */   0, 0,
                /* Right  */   0, 0,
                /* Top    */   rect.left(), rect.right(),
@@ -447,17 +447,16 @@ void RazorPanelPrivate::realign()
                /* Top    */   0, 0,
                /* Bottom */   rect.left(), rect.right()
                          );
-            break;
+        break;
 
         case RazorPanel::PositionLeft:
-            xf.setStrut(wid, q->width(), 0, 0, 0,
+            xf.setStrut(wid,  q->width(), 0, 0, 0,
                /* Left   */   rect.top(), rect.bottom(),
                /* Right  */   0, 0,
                /* Top    */   0, 0,
                /* Bottom */   0, 0
                          );
-
-            break;
+        break;
 
         case RazorPanel::PositionRight:
             xf.setStrut(wid, 0, desktop.width() - rect.x(), 0, 0,
@@ -466,7 +465,7 @@ void RazorPanelPrivate::realign()
                /* Top    */   0, 0,
                /* Bottom */   0, 0
                          );
-            break;
+        break;
     }
 
     emit q->panelRealigned();
@@ -964,16 +963,18 @@ void RazorPanel::leaveEvent(QEvent *e){
     animation->setDuration(d->mAutoHideSpeed);
     animation->setStartValue(QRect(this->x(), this->y(), this->width(), this->height()));
 
+    QRect screen = QApplication::desktop()->screenGeometry(d->mScreenNum);
+
     switch (d->mPosition)
     {
     case RazorPanel::PositionBottom:
-        animation->setEndValue(QRect(this->x(), QApplication::desktop()->height()-1, this->width(), this->height()));
+        animation->setEndValue(QRect(this->x(), screen.height()-1, this->width(), this->height()));
         break;
     case RazorPanel::PositionLeft:
         animation->setEndValue(QRect(-this->width()+1, this->y(), this->width(), this->height()));
         break;
     case RazorPanel::PositionRight:
-        animation->setEndValue(QRect(QApplication::desktop()->width()-1, this->y(), this->width(), this->height()));
+        animation->setEndValue(QRect(screen.width()-1, this->y(), this->width(), this->height()));
         break;
     case RazorPanel::PositionTop:
         animation->setEndValue(QRect(this->x(), -this->height()+1, this->width(), this->height()));
@@ -996,16 +997,18 @@ void RazorPanel::enterEvent(QEvent *e){
     animation->setDuration(d->mAutoHideSpeed);
     animation->setStartValue(QRect(this->x(), this->y(), this->width(), this->height()));
 
+    QRect screen = QApplication::desktop()->screenGeometry(d->mScreenNum);
+
     switch (d->mPosition)
     {
     case RazorPanel::PositionBottom:
-        animation->setEndValue(QRect(this->x(), QApplication::desktop()->height()-this->height(), this->width(), this->height()));
+        animation->setEndValue(QRect(this->x(), screen.height()-this->height(), this->width(), this->height()));
         break;
     case RazorPanel::PositionLeft:
         animation->setEndValue(QRect(0, this->y(), this->width(), this->height()));
         break;
     case RazorPanel::PositionRight:
-        animation->setEndValue(QRect(QApplication::desktop()->width()-this->width(), this->y(), this->width(), this->height()));
+        animation->setEndValue(QRect(screen.width()-this->width(), this->y(), this->width(), this->height()));
         break;
     case RazorPanel::PositionTop:
         animation->setEndValue(QRect(this->x(),0,this->width(), this->height()));
