@@ -1,0 +1,57 @@
+.TH razor-autosuspend "1" "September 2012" "Razor\-Qt\ 0.5.0" "Razor\-Qt\ Module"
+.SH NAME
+razorqt-autosuspend \- Energy and power manager Module of Razor-qt: the faster and lighter QT Desktop Environment
+.SH SYNOPSIS
+.B razor-autosuspend
+.br
+.SH DESCRIPTION
+This module handle power action over battery and hardware, especially for laptop users, 
+it communicates with dbus for handle operation over LID and CPU control
+.P
+\fBRazor-qt\fR is an advanced, easy-to-use, and fast desktop environment based on Qt
+technologies. As new project, already contains the key DE components
+and can be used separately, not all of them need to be used at once:
+.P
+ * Panel
+ * Desktop
+ * Application launcher
+ * Settings center
+ * Sessions
+ * Polkit handler
+ * Display manager handler
+ * Power manager and energy saver \fI(related to this)\fR
+.P
+These components perform similar actions to those available in other desktop
+environments, and their name is self-descriptive.  They are usually not launched
+by hand but automatically, when choosing a Razor\-Qt session in the Display
+Manager.
+.P
+.SH BEHAVIOR
+.P
+It communicates with dbus for handle operation over LID and CPU control.
+.P
+Operations are defined throught the \fBrazor\-config\-autosuspend\fR application, 
+and performed by the \fBrazor\-power\fR application.
+.P
+.SH AUTOSTART
+.P
+The module only are showed on Razor-qt desktop, but u can create an autostart action 
+for u prefered desktop environment.
+.P
+.SH "REPORTING BUGS"
+Report bugs to https://github.com/Razor-qt/Razor-qt/issues
+.SH "SEE ALSO"
+\fBRazor-qt\fR it has been tailored for users who value simplicity, speed, and
+an intuitive interface.  Razor-qt is also intended for less powerful machines. See:
+
+.\" any module must refers to session app, for more info on start it
+.P
+\fBrazor-session.1\fR  Razor-qt for manage Razor-qt complete environment
+.P
+\fBrazor-config-autosuspend.1\fR  Razor-qt application for config power/enegy save actions
+.P
+\fBrazor-power.1\fR  Razor-qt application for performing power management actions
+.P
+.SH AUTHOR
+This manual page was created by \fBPICCORO Lenz McKAY\fR \fI<mckaygerhard@gmail.com>\fR 
+for \fBRazor-qt\fR project and VENENUX GNU/Linux but can be used by others.
