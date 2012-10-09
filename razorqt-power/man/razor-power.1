@@ -1,4 +1,4 @@
-.TH razor-power "1" "September 2012" "Razor\-qt\ 0.5.0" "Razor\-Qt\ Module"
+.TH razor-power "1" "September 2012" "Razor\-qt\ 0.5.0" "Razor\-qt\ Module"
 .SH NAME
 razor-power \- Module of Razor-qt: the faster and lighter QT Desktop Environment
 .SH SYNOPSIS
@@ -7,17 +7,12 @@ razor-power \- Module of Razor-qt: the faster and lighter QT Desktop Environment
 .br
 .SH DESCRIPTION
 This module handle power action over battery and hardware, especially for laptop users, 
-it communicates with dbus for handle operation over LID and CPU control, operations 
-are defined throught 
-.br
-the \fBrazor-config-autosuspend\fR application, and performed by
-.br
-the \fBrazor-power\fR application.
+it communicates with dbus for handle operation over LID and CPU control.
 .P
 The \fBRazor-qt modules\fR are desktop independent tools, that do not accept option parsing, 
 and operate as daemons for the local user for desktop specific operations.
 .P
-Razor-qt is an advanced, easy-to-use, and fast desktop environment based on Qt
+\fBRazor-qt\fR is an advanced, easy-to-use, and fast desktop environment based on Qt
 technologies. As new project, already contains the key DE components and can be used 
 separately, not all of them need to be used at once:
 .P
@@ -25,20 +20,32 @@ separately, not all of them need to be used at once:
  * Desktop
  * Application launcher
  * Settings center
- * Sessions
+ * Sessions handler
  * Polkit handler
  * Display manager handler
  * Power manager and energy saver \fI(this)\fR
 .P
 These components perform similar actions to those available in other desktop
 environments, and their name is self-descriptive.  They are usually not launched
-by hand but automatically, when choosing a Razor\-Qt session in the Display
+by hand but automatically, when choosing a \fBRazor\-qt\fR session in the Display
 Manager.
+.P
+.SH BEHAVIOR
+.P
+It communicates with dbus for handle operation over LID and CPU control.
+.P
+Operations are defined throught the \fBrazor\-config\-autosuspend\fR application, 
+and performed by the \fBrazor\-power\fR application.
+.P
+.SH AUTOSTART
+.P
+The module only are showed on Razor-qt desktop, but u can create an autostart action 
+for u prefered desktop environment.
 .P
 .SH "REPORTING BUGS"
 Report bugs to https://github.com/Razor-qt/Razor-qt/issues
 .SH "SEE ALSO"
-Razor-qt it has been tailored for users who value simplicity, speed, and
+\fBRazor-qt\fR it has been tailored for users who value simplicity, speed, and
 an intuitive interface.  Razor-qt is also intended for less powerful machines. See:
 
 .\" any module must refers to session app, for more info on start it

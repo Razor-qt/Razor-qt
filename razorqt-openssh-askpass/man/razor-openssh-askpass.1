@@ -1,19 +1,19 @@
-.TH razor-policykit-agent "1" "September 2012" "Razor\-qt\ 0.5.0" "Razor\-Qt\ Module"
+.TH razor-openssh-askpass "1" "September 2012" "Razor\-qt\ 0.5.0" "Razor\-qt\ Module"
 .SH NAME
-razor-policykit-agent \- Module of Razor-qt: the faster and lighter QT Desktop Environment
+razor-openssh-askpass \- Module of Razor-qt: the faster and lighter QT Desktop Environment
 .SH SYNOPSIS
-.B razor-policykit-agent
+.B razor-openssh-askpass
 [\fINo command line arguments\fR]
 .br
 .SH DESCRIPTION
-This module handles policykit for Razor-qt. The polkit handle module, will perform 
-security tast over scale action privilegies.
+This module handles opensh security password ask for Razor-qt. The openssh askpass handle module, will perform 
+security tast over scale accesss privilegies.
 .P
 .P
 The \fBRazor-qt modules\fR are desktop independent tools, that do not accept option parsing, 
 and operate as daemons for the local user for desktop specific operations. 
 .P
-Razor-qt is an advanced, easy-to-use, and fast desktop environment based on Qt
+\fBRazor-qt\fR is an advanced, easy-to-use, and fast desktop environment based on Qt
 technologies. As new project, already contains the key DE components
 and can be used separately, not all of them need to be used at once:
 .P
@@ -22,7 +22,8 @@ and can be used separately, not all of them need to be used at once:
  * Application launcher
  * Settings center
  * Sessions
- * Polkit handler \fI(this)\fR
+ * Polkit handler
+ * SSH password access \fI(this)\fR
  * Display manager handler
 .P
 These components perform similar actions to those available in other desktop
@@ -31,8 +32,12 @@ by hand but automatically, when choosing a Razor\-Qt session in the Display
 Manager.
 .SH BEHAVIOR
 .P
-The module detected on shares privilege escalation, and maintain a security dialog 
-that ask for the user's key need for action.
+The module detected on shares privilege accesss, and maintain a security dialog 
+that ask for the user's key need for access over another machine host.
+.P
+This module are very early stage, and not enabled by default, so u must added a env 
+by the \fBrazor\-settings\fR application as \fISSH_ASKPASS=\fR 
+with \fBrazor\-openssh\-askpass\fR value, openssl and openssh-client packages must be required.
 .P
 .SH AUTOSTART
 .P
@@ -49,7 +54,7 @@ an intuitive interface.  Razor-qt is also intended for less powerful machines. S
 .P
 \fBrazor-session.1\fR  Razor-qt for manage Razor-qt complete environment
 .P
-\fBstart-razor.1\fR  Razor-qt display management independient starup.
+\fBrazor-policykit-agent.1\fR  Razor-qt plolicykit agent module for privilegie scalation.
 .P
 \fBrazor-config-session.1\fR  Razor-qt application for performing session autostart applications
 .P
