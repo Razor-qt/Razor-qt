@@ -1,18 +1,17 @@
 .TH razor-session "1" "September 2012" "Razor\-Qt\ 0.5.0" "Razor\-Qt\ Module"
 .SH NAME
-razorqt-session \- Module of Razor-qt: the faster and lighter QT Desktop Environment
+razorqt-session \- Session manager of \fBRazor-qt\fR: the faster and lighter QT Desktop Environment
 .SH SYNOPSIS
 .B razor-session
-[\fINo command line arguments\fR]
+[\fICurrently No command line arguments\fR]
 .br
 .SH DESCRIPTION
 This module handle session autostart application over \fBRazor-qt\fR desktop environment startup.
 .P
-The \fBRazor-qt modules\fR are desktop independent tools, that do not accept option parsing, 
+The \fBRazor-qt modules\fR are desktop independent tools, 
 and operate as daemons for the local user for desktop specific operations. 
 .P
-As new project,\fB Razor-qt\fR already contains the key DE components
-and can be used separately, not all of them need to be used at once:
+\fBRazor-qt\fR ships several core desktop components, all of which are optional:
 .P
  * Panel
  * Desktop
@@ -20,31 +19,26 @@ and can be used separately, not all of them need to be used at once:
  * Settings center
  * Session handler \fI(this)\fR
  * Polkit handler
+ * SSH password access
  * Display manager handler
 .P
 These components perform similar actions to those available in other desktop
-environments, and their name is self-descriptive.  They are usually not launched
-by hand but automatically, when choosing a Razor\-Qt session in the Display
+environments, and their names are self-descriptive.  They are usually not launched
+by hand but automatically, when choosing a \fBRazor\-qt\fR session in the Display
 Manager.
-.P
 .SH BEHAVIOR
+Through this application \fBRazor-qt\fR desktop environment manage the session desktop behavior, 
+module loading and related starup programs before user gets a working area. By default this module 
+load the panel, desktop and power modules of \fBRazor\-qt\fR environment, such then this its a 
+important module for a working razor sesion.
 .P
-Each of any desktop environment has any way to configure applications need or want to start at logon.
-.P
-They can be (en|dis)abled in \fBrazorqt-config-sesion > Autostart > Application Autostart\fR, 
-." razor@kenfallon.com - Not sure what you mean here
-." but you can also added manualy to your favorite desktop in session settings related programs.
-." Configurations for session are made using the \fBrazorqt-config-sesion\fR application.
-."For example autostart programs, but you can also manualy add other programs.
-." mckaygerhard@gmail.com - OK ill fixed now jejje, this manpage i made in hurry only for proposal.
-Through this application you can manage which programs will be loaded at the start of a 
-session of \fBrazorqt\fR desktop environment.
-.P
+Each of any desktop environment has any way to configure applications need or want to start at logon, 
+so user can manage manualy in the \fBrazor-config-session\fR application.
 .SH "REPORTING BUGS"
 Report bugs to https://github.com/Razor-qt/Razor-qt/issues
 .SH "SEE ALSO"
 \fBRazor-qt\fR it has been tailored for users who value simplicity, speed, and
-an intuitive interface and is also intended for less powerful machines. See:
+an intuitive interface, also intended for less powerful machines. See also:
 .\" any module must refers to session app, for more info on start it
 .P
 \fBrazor-config.1\fR  Razor-qt application for manage configurations and settings
