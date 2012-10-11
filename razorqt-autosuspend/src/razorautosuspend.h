@@ -49,6 +49,7 @@ protected:
 private slots:
     void lidChanged(bool closed);
     void batteryChanged();
+    void settingsChanged();
 
 private:
     void doAction(int action);
@@ -60,6 +61,7 @@ private:
     RazorNotification razorNotification;
     QTime actionTime;
     TrayIcon trayIcon;
+    RazorSettings m_Settings;
 };
 
 #endif // RAZORAUTOSUSPENDD_H
