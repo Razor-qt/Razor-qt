@@ -78,6 +78,15 @@ RazorPanel[position="1"] #DesktopSwitch QToolButton
  */
 #QuickLaunch {}
 
+#QuickLaunch QToolButton:hover{
+	border: 1px solid #80a8d3;
+}
+
+#QuickLaunch QToolButton:pressed{
+	border: 1px solid #80a8d3;
+	background: rgba(255, 255, 255, 80%);
+}
+
 /*
  * TaskBar
  */
