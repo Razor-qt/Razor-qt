@@ -69,7 +69,7 @@ RazorVolume::RazorVolume(const RazorPanelPluginStartInfo* startInfo, QWidget* pa
     QKeySequence keySequenceVolumeUp(Qt::Key_VolumeUp);
     if (!m_keyVolumeUp->setShortcut(keySequenceVolumeUp)) {
         notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeUp.toString()));
-		notify->Update();
+		notify->update();
     }
 
     QKeySequence keySequenceVolumeDown(Qt::Key_VolumeDown);
