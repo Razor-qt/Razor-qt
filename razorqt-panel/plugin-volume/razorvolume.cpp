@@ -58,6 +58,7 @@ RazorVolume::RazorVolume(const RazorPanelPluginStartInfo* startInfo, QWidget* pa
     m_volumeButton = new VolumeButton(panel(), this);
     addWidget(m_volumeButton);
 
+	notify = new RazorNotification("", this);
     m_configWindow = new RazorVolumeConfiguration(settings(), this);
 
     // global key shortcuts
@@ -67,17 +68,20 @@ RazorVolume::RazorVolume(const RazorPanelPluginStartInfo* startInfo, QWidget* pa
 
     QKeySequence keySequenceVolumeUp(Qt::Key_VolumeUp);
     if (!m_keyVolumeUp->setShortcut(keySequenceVolumeUp)) {
-        RazorNotification::notify(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeUp.toString()));
+        notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeUp.toString()));
+		notify->Update();
     }
 
     QKeySequence keySequenceVolumeDown(Qt::Key_VolumeDown);
     if (!m_keyVolumeDown->setShortcut(keySequenceVolumeDown)) {
-        RazorNotification::notify(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeDown.toString()));
+        notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeDown.toString()));
+		notify->update();
     }
 
     QKeySequence keySequenceMuteToggle(Qt::Key_VolumeMute);
     if (!m_keyMuteToggle->setShortcut(keySequenceMuteToggle)) {
-        RazorNotification::notify(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceMuteToggle.toString()));
+        notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceMuteToggle.toString()));
+		notify->update();
     }
 
     connect(m_keyVolumeUp, SIGNAL(activated()), this, SLOT(handleShortcutVolumeUp()));
@@ -155,13 +159,21 @@ void RazorVolume::updateConfigurationSinkList()
 void RazorVolume::handleShortcutVolumeUp()
 {
     if (m_defaultSink)
+	{
         m_defaultSink->setVolume(m_defaultSink->volume() + settings().value(SETTINGS_STEP, SETTINGS_DEFAULT_STEP).toInt());
+		notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
+		notify->update();
+	}
 }
 
 void RazorVolume::handleShortcutVolumeDown()
 {
     if (m_defaultSink)
+	{
         m_defaultSink->setVolume(m_defaultSink->volume() - settings().value(SETTINGS_STEP, SETTINGS_DEFAULT_STEP).toInt());
+		notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
+		notify->update();
+	}
 }
 
 void RazorVolume::handleShortcutVolumeMute()
