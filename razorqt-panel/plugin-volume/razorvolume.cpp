@@ -170,8 +170,8 @@ void RazorVolume::handleShortcutVolumeUp()
     if (m_defaultSink)
     {
         m_defaultSink->setVolume(m_defaultSink->volume() + settings().value(SETTINGS_STEP, SETTINGS_DEFAULT_STEP).toInt());
-        notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
-        notify->update();
+        m_notification->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
+        m_notification->update();
     }
 }
 
@@ -180,8 +180,8 @@ void RazorVolume::handleShortcutVolumeDown()
     if (m_defaultSink)
     {
         m_defaultSink->setVolume(m_defaultSink->volume() - settings().value(SETTINGS_STEP, SETTINGS_DEFAULT_STEP).toInt());
-        notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
-        notify->update();
+        m_notification->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
+        m_notification->update();
     }
 }
 
