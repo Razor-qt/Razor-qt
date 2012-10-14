@@ -58,31 +58,40 @@ RazorVolume::RazorVolume(const RazorPanelPluginStartInfo* startInfo, QWidget* pa
     m_volumeButton = new VolumeButton(panel(), this);
     addWidget(m_volumeButton);
 
-	notify = new RazorNotification("", this);
+    m_notification = new RazorNotification("", this);
     m_configWindow = new RazorVolumeConfiguration(settings(), this);
 
     // global key shortcuts
     m_keyVolumeUp = new QxtGlobalShortcut(this);
     m_keyVolumeDown = new QxtGlobalShortcut(this);
     m_keyMuteToggle = new QxtGlobalShortcut(this);
+    QString shortcutNotRegistered;
 
     QKeySequence keySequenceVolumeUp(Qt::Key_VolumeUp);
-    if (!m_keyVolumeUp->setShortcut(keySequenceVolumeUp)) {
-        notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeUp.toString()));
-		notify->update();
+    if (!m_keyVolumeUp->setShortcut(keySequenceVolumeUp)) 
+    {
+        shortcutNotRegistered = "'" + keySequenceVolumeUp.toString() + "' ";
     }
 
     QKeySequence keySequenceVolumeDown(Qt::Key_VolumeDown);
-    if (!m_keyVolumeDown->setShortcut(keySequenceVolumeDown)) {
-        notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceVolumeDown.toString()));
-		notify->update();
+    if (!m_keyVolumeDown->setShortcut(keySequenceVolumeDown)) 
+    {
+        shortcutNotRegistered += "'" + keySequenceVolumeDown.toString() + "' ";
     }
 
     QKeySequence keySequenceMuteToggle(Qt::Key_VolumeMute);
-    if (!m_keyMuteToggle->setShortcut(keySequenceMuteToggle)) {
-        notify->setSummary(tr("Volume Control: Global shortcut '%1' cannot be registered").arg(keySequenceMuteToggle.toString()));
-		notify->update();
+    if (!m_keyMuteToggle->setShortcut(keySequenceMuteToggle)) 
+    {
+        shortcutNotRegistered += "'" + keySequenceMuteToggle.toString() + "' ";
     }
+    
+    if(shortcutNotRegistered.isEmpty())
+    {
+        m_notification->setSummary(tr("Volume Control: The following shortcuts can not be registered: %1").arg(shortcutNotRegistered));
+        m_notification->update();
+    }
+    
+    m_notification->setTimeout(1000);
 
     connect(m_keyVolumeUp, SIGNAL(activated()), this, SLOT(handleShortcutVolumeUp()));
     connect(m_keyVolumeDown, SIGNAL(activated()), this, SLOT(handleShortcutVolumeDown()));
@@ -159,21 +168,21 @@ void RazorVolume::updateConfigurationSinkList()
 void RazorVolume::handleShortcutVolumeUp()
 {
     if (m_defaultSink)
-	{
+    {
         m_defaultSink->setVolume(m_defaultSink->volume() + settings().value(SETTINGS_STEP, SETTINGS_DEFAULT_STEP).toInt());
-		notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
-		notify->update();
-	}
+        notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
+        notify->update();
+    }
 }
 
 void RazorVolume::handleShortcutVolumeDown()
 {
     if (m_defaultSink)
-	{
+    {
         m_defaultSink->setVolume(m_defaultSink->volume() - settings().value(SETTINGS_STEP, SETTINGS_DEFAULT_STEP).toInt());
-		notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
-		notify->update();
-	}
+        notify->setSummary(tr("Volume: %1").arg(QString::number(m_defaultSink->volume())));
+        notify->update();
+    }
 }
 
 void RazorVolume::handleShortcutVolumeMute()

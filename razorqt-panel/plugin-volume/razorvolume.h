@@ -66,7 +66,7 @@ private:
     QxtGlobalShortcut *m_keyVolumeUp;
     QxtGlobalShortcut *m_keyVolumeDown;
     QxtGlobalShortcut *m_keyMuteToggle;
-	RazorNotification *notify;
+    RazorNotification *m_notification;
 };
 
 EXPORT_RAZOR_PANEL_PLUGIN_H
