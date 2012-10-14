@@ -9,5 +9,5 @@ Comment=Displays network status and activity.
 
 
 # Translations
-Comment[es]=Administrador de tareas
-Name[es]=Entorno de escritorio Qt4
+Comment[es]=Muestra el estado y actividad de la red
+Name[es]=Red
