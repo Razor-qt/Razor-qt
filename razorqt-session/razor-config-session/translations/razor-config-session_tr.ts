@@ -88,15 +88,15 @@
     </message>
     <message>
         <source>Razor Modules</source>
-        <translation type="unfinished"/>
+        <translation>Razor Modülleri</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"/>
+        <translation>Başlat</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"/>
+        <translation>Durdur</translation>
     </message>
     <message>
         <source>Select a window manager</source>
