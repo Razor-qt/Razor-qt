@@ -44,6 +44,14 @@
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
 
+static const int maximumDrift = 2;  // maximum drift, in seconds, between
+                                    // a minute rollover and the time update.
+
+static const int deadTime = 500;    // amouunt of time, in miliseconds, to
+                                    // compensate the time elapsed between
+                                    // getting the time and setting a new
+                                    // interval.
+
 /**
  * @file razorclock.cpp
  * @brief implements Razorclock and Razorclockgui
@@ -91,7 +99,6 @@ RazorClock::RazorClock(const RazorPanelPluginStartInfo* startInfo, QWidget* pare
 
     mClockTimer = new QTimer(this);
     connect (mClockTimer, SIGNAL(timeout()), SLOT(updateTime()));
-    mClockTimer->start(1000);
 
     mFirstDayOfWeek = firstDayOfWeek();
 
@@ -110,6 +117,20 @@ void RazorClock::updateTime()
     QDateTime now(mUseUTC ? QDateTime::currentDateTimeUtc() : QDateTime::currentDateTime());
 #endif
 
+    if (mTimeFormat.indexOf("ss") == -1)
+    {
+        // update every minute
+        int seconds = QTime::currentTime().second();
+        if (seconds > maximumDrift)
+        {
+            // drift was detected. Let's arm the timer with a value to remove
+            // the drift.
+            connect(mClockTimer, SIGNAL(timeout()),
+                this, SLOT(setMinuteTimeout()));
+            mClockTimer->setInterval(((60 - seconds) * 1000) + deadTime);
+        }
+    }
+
     if (mDateOnNewLine)
     {
         mTimeLabel->setText(QLocale::system().toString(now, mTimeFormat));
@@ -121,6 +142,15 @@ void RazorClock::updateTime()
     }
 }
 
+void RazorClock::setMinuteTimeout()
+{
+    // I only get called if drift has been detected OR the settings changed
+
+    // the drift has been corrected... disconnecting myself
+    disconnect(mClockTimer, SIGNAL(timeout()), this, SLOT(setMinuteTimeout()));
+    mClockTimer->start(60000);
+}
+
 /**
  * @brief destructor
  */
@@ -130,6 +160,7 @@ RazorClock::~RazorClock()
 
 void RazorClock::settingsChanged()
 {
+    mClockTimer->stop();
     mTimeFormat = settings().value("timeFormat", QLocale::system().timeFormat(QLocale::ShortFormat).toUpper().contains("AP") ? "h:mm AP" : "HH:mm").toString();
 
     mUseUTC = settings().value("UTC", false).toBool();
@@ -153,6 +184,30 @@ void RazorClock::settingsChanged()
 
     updateMinWidth();
 
+    int interval;
+    if (mTimeFormat.indexOf("ss") > -1)
+    {
+        // update every second
+
+        // the mClockTimer timeout() signal can be connected to the
+        // setMinuteTimeout() slot OR not. We disconnect it, otherwise we could
+        // be only updating every minute.
+        interval = 1000;
+        disconnect(mClockTimer, SIGNAL(timeout()), this, SLOT(setMinuteTimeout()));
+    }
+    else
+    {
+        // update every minute
+
+        // the setMinuteTimeout is called only after drift was detected. And of
+        // course when the settings change.
+
+        connect(mClockTimer, SIGNAL(timeout()), this, SLOT(setMinuteTimeout()));
+        int seconds = QTime::currentTime().second();
+        interval = (60 - seconds) * 1000 + deadTime;
+    }
+
+    mClockTimer->start(interval);
     updateTime();
 }
 

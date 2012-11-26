@@ -60,6 +60,7 @@ protected:
 protected slots:
     virtual void settingsChanged();
     virtual void showConfigureDialog();
+    void setMinuteTimeout();
 
 private:
     QTimer* mClockTimer;
