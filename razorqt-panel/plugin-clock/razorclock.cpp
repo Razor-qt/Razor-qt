@@ -47,7 +47,7 @@
 static const int maximumDrift = 2;  // maximum drift, in seconds, between
                                     // a minute rollover and the time update.
 
-static const int deadTime = 500;    // amouunt of time, in miliseconds, to
+static const int deadTime = 500;    // amount of time, in milliseconds, to
                                     // compensate the time elapsed between
                                     // getting the time and setting a new
                                     // interval.
