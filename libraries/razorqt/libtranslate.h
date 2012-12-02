@@ -31,10 +31,19 @@
 #include <QtCore/QTranslator>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QLocale>
+#include <QtCore/QMutex>
 
 inline void libTranslate(const QString &name)
 {
-    static bool alreadyLoaded = false;
+    static QMutex mutex;
+    static QList<QString> libs;
+
+    mutex.lock();
+    bool alreadyLoaded = libs.contains(name);
+    if (!alreadyLoaded)
+        libs.append(name);
+    mutex.unlock();
+
     if (alreadyLoaded)
         return;
 
@@ -43,7 +52,6 @@ inline void libTranslate(const QString &name)
     translator->load(QString("%1/%2_%3.qm").arg(TRANSLATIONS_DIR, name, locale));
 
     QCoreApplication::installTranslator(translator);
-    alreadyLoaded = true;
 }
 
 
