@@ -6,8 +6,8 @@ Exec=razor-config-mouse
 Terminal=false
 Categories=Settings;DesktopSettings;Qt;X-RAZOR;
 Icon=preferences-desktop-mouse
-Name=Razor Mouse Configurator
-Comment=Configure X11 mouse
-GenericName=Razor Mouse Configurator
+Name=Razor Cursor Theme Configurator
+Comment=Configure X11 mouse theme
+GenericName=Razor Cursor Theme Configurator
 
 #TRANSLATIONS_DIR=translations
