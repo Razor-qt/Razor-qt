@@ -182,7 +182,7 @@ ShortcutEditor::ShortcutEditor(QWidget *parent)
 void ShortcutEditor::editItem(QTreeWidgetItem *item , int column)
 {
     /// don't edit shortcut / command for top level items
-    if (NULL != item->parent() || column == 0)
+    if (NULL != item->parent() && column != 0)
     {
         mTreeWidget->editItem(item , column);
     }
