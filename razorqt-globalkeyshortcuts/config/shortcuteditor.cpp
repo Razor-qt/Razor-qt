@@ -182,7 +182,7 @@ ShortcutEditor::ShortcutEditor(QWidget *parent)
 void ShortcutEditor::editItem(QTreeWidgetItem *item , int column)
 {
     /// don't edit shortcut / command for top level items
-    if (NULL != item->parent() && column != 0)
+    if (NULL != item->parent())
     {
         mTreeWidget->editItem(item , column);
     }
@@ -307,7 +307,7 @@ void ShortcutEditor::resetChanges()
 void ShortcutEditor::addGroup()
 {
     QTreeWidgetItem *groupItem = new QTreeWidgetItem(QStringList() << tr("New Group"));
-    groupItem->setFlags(groupItem->flags() | Qt::ItemIsEditable);
+    groupItem->setFlags(groupItem->flags());
     mTreeWidget->insertTopLevelItem(0 , groupItem);
 }
 
