@@ -54,6 +54,10 @@ ConfigPanelDialog::ConfigPanelDialog(int hDefault, int wMax, RazorSettings *sett
     connect(ui->comboBox_position, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxPositionIndexChanged(int)));
     connect(ui->spinBox_length, SIGNAL(valueChanged(int)),this, SLOT(spinBoxWidthValueChanged(int)));
     connect(ui->checkBox_useAutoSize, SIGNAL(toggled(bool)), this, SLOT(checkBoxUseAutoSizeChanged(bool)));
+
+    ui->horizontalSlider_hideSpeed->setMaximum(KEY_AUTOHIDE_SPEED_MAX);
+    ui->horizontalSlider_hideSpeed->setMinimum(KEY_AUTOHIDE_SPEED_MIN);
+    ui->horizontalSlider_hideSpeed->setPageStep(KEY_AUTOHIDE_SPEED_STEP);
 }
 
 void ConfigPanelDialog::setSizeLimits(const int minimum, const int maximum)
@@ -72,6 +76,8 @@ void ConfigPanelDialog::reset()
     mAlignment = RazorPanel::Alignment(mSettings->value(CFG_KEY_ALIGNMENT, RazorPanel::AlignmentCenter).toInt());
     mPosition = RazorPanelPrivate::strToPosition(mSettings->value(CFG_KEY_POSITION).toString(), RazorPanel::PositionBottom);
     mScreenNum = mSettings->value(CFG_KEY_SCREENNUM, QApplication::desktop()->primaryScreen()).toInt();
+    mUseAutoHide = mSettings->value(CFG_KEY_AUTOHIDE,false).toBool();
+    mAutoHideSpeed = mSettings->value(CFG_KEY_AUTOHIDE_SPEED,(KEY_AUTOHIDE_SPEED_MAX + KEY_AUTOHIDE_SPEED_MIN)/2).toInt();
     mSettings->endGroup();
 
     ui->spinBox_size->setValue(mSize);
@@ -80,6 +86,9 @@ void ConfigPanelDialog::reset()
     ui->comboBox_widthType->setCurrentIndex(mWidthInPercents ? 0 : 1);
     ui->comboBox_alignment->setCurrentIndex(mAlignment + 1);
     ui->checkBox_useAutoSize->setChecked(mUseAutoSize);
+    ui->checkBox_autoHide->setChecked(mUseAutoHide);
+    ui->horizontalSlider_hideSpeed->setEnabled(mUseAutoHide);
+    ui->horizontalSlider_hideSpeed->setValue(mAutoHideSpeed);
 
     if (ui->comboBox_position->count() == 0)
     {
@@ -132,6 +141,8 @@ void ConfigPanelDialog::save()
     mSettings->setValue(CFG_KEY_AUTOSIZE, mUseAutoSize);
     mSettings->setValue(CFG_KEY_POSITION, RazorPanelPrivate::positionToStr(mPosition));
     mSettings->setValue(CFG_KEY_SCREENNUM, mScreenNum);
+    mSettings->setValue(CFG_KEY_AUTOHIDE, ui->checkBox_autoHide->checkState()? true : false);
+    mSettings->setValue(CFG_KEY_AUTOHIDE_SPEED, ui->horizontalSlider_hideSpeed->value());
     mSettings->endGroup();
 }
 
@@ -150,7 +161,7 @@ void ConfigPanelDialog::spinBoxWidthValueChanged(int q)
     else
        ui->comboBox_alignment->setEnabled(false);
 
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize);
+    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize,mUseAutoHide,mAutoHideSpeed);
 }
 
 void ConfigPanelDialog::comboBoxWidthTypeIndexChanged(int q)
@@ -174,7 +185,7 @@ void ConfigPanelDialog::comboBoxWidthTypeIndexChanged(int q)
 void ConfigPanelDialog::comboBoxAlignmentIndexChanged(int q)
 {
     mAlignment = RazorPanel::Alignment(q - 1);
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize);
+    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize, mUseAutoHide, mAutoHideSpeed);
 }
 
 void ConfigPanelDialog::comboBoxPositionIndexChanged(int q)
@@ -188,7 +199,7 @@ void ConfigPanelDialog::comboBoxPositionIndexChanged(int q)
 void ConfigPanelDialog::spinBoxHeightValueChanged(int q)
 {
     mSize=q;
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize);
+    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize, mUseAutoHide, mAutoHideSpeed);
 }
 
 void ConfigPanelDialog::checkBoxUseAutoSizeChanged(bool state)
@@ -212,5 +223,18 @@ void ConfigPanelDialog::checkBoxUseAutoSizeChanged(bool state)
         mSize = ui->spinBox_size->value();
     }
 
-    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize);
+    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize, mUseAutoHide, mAutoHideSpeed);
+}
+
+void ConfigPanelDialog::on_horizontalSlider_hideSpeed_valueChanged(int value)
+{
+    mAutoHideSpeed=ui->horizontalSlider_hideSpeed->value();
+    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize, mUseAutoHide, mAutoHideSpeed);
+}
+
+void ConfigPanelDialog::on_checkBox_autoHide_stateChanged(int arg1)
+{
+    ui->horizontalSlider_hideSpeed->setEnabled(arg1 ? true : false);
+    mUseAutoHide=ui->checkBox_autoHide->checkState();
+    emit configChanged(mSize, mLength, mWidthInPercents, mAlignment, mUseAutoSize, mUseAutoHide, mAutoHideSpeed);
 }

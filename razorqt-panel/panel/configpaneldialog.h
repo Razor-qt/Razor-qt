@@ -33,14 +33,20 @@
 
 #define CFG_PANEL_GROUP     "panel"
 
-#define CFG_KEY_SCREENNUM   "desktop"
-#define CFG_KEY_POSITION    "position"
-#define CFG_KEY_PLUGINS     "plugins"
-#define CFG_KEY_HEIGHT      "height"
-#define CFG_KEY_WIDTH       "width"
-#define CFG_KEY_PERCENT     "width-percent"
-#define CFG_KEY_ALIGNMENT   "alignment"
-#define CFG_KEY_AUTOSIZE    "auto-size"
+#define CFG_KEY_SCREENNUM       "desktop"
+#define CFG_KEY_POSITION        "position"
+#define CFG_KEY_PLUGINS         "plugins"
+#define CFG_KEY_HEIGHT          "height"
+#define CFG_KEY_WIDTH           "width"
+#define CFG_KEY_PERCENT         "width-percent"
+#define CFG_KEY_ALIGNMENT       "alignment"
+#define CFG_KEY_AUTOSIZE        "auto-size"
+#define CFG_KEY_AUTOHIDE        "auto-hide"
+#define CFG_KEY_AUTOHIDE_SPEED  "auto-hide-speed"
+
+#define KEY_AUTOHIDE_SPEED_MAX  1300
+#define KEY_AUTOHIDE_SPEED_MIN  20
+#define KEY_AUTOHIDE_SPEED_STEP 10
 
 #define CFG_FULLKEY_PLUGINS "panel/plugins"
 
@@ -60,7 +66,7 @@ public:
     void setSizeLimits(const int minimum, const int maximum);
 
 signals:
-    void configChanged(int height, int width, bool percent, RazorPanel::Alignment, bool mUseAutoSize);
+    void configChanged(int height, int width, bool percent, RazorPanel::Alignment, bool mUseAutoSize, bool mUseAutoHide, int mAutoHideSpeed);
     void positionChanged(int screen, RazorPanel::Position);
 
 public slots:
@@ -74,6 +80,8 @@ private slots:
     void comboBoxAlignmentIndexChanged(int q);
     void comboBoxPositionIndexChanged(int q);
     void checkBoxUseAutoSizeChanged(bool state);
+    void on_horizontalSlider_hideSpeed_valueChanged(int value);
+    void on_checkBox_autoHide_stateChanged(int arg1);
 
 private:
     Ui::ConfigPanelDialog *ui;
@@ -85,7 +93,9 @@ private:
     int mLength;
     bool mWidthInPercents;
     bool mUseAutoSize;
+    bool mUseAutoHide;
     int mScreenNum;
+    int mAutoHideSpeed;
     RazorPanel::Position mPosition;
     RazorPanel::Alignment mAlignment;
 
