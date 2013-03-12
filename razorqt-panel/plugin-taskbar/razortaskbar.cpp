@@ -90,7 +90,7 @@ RazorTaskBar::~RazorTaskBar()
  ************************************************/
 void RazorTaskBar::updateSizePolicy()
 {
-    QSizePolicy sp(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QSizePolicy sp(QSizePolicy::Expanding, panel()->isHorizontal() ? QSizePolicy::Expanding : QSizePolicy::Fixed);
     sp.setHorizontalStretch(1);
     sp.setVerticalStretch(1);
     setSizePolicy(sp);
