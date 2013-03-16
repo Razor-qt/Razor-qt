@@ -52,4 +52,4 @@ target_link_libraries( razor-config qcategorizedview)
 
 INSTALL(TARGETS razor-config RUNTIME DESTINATION bin)
 install(FILES ${DESKTOP_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-install(FILES razor-config.menu DESTINATION /etc/xdg/menus/)
+install(FILES razor-config.menu DESTINATION ${RAZOR_ETC_XDG_DIRECTORY}/menus/)

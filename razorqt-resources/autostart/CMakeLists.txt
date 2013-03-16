@@ -11,4 +11,4 @@ razor_translate_desktop(DESKTOP_FILES
 add_custom_target(autostart_desktop_files ALL DEPENDS ${DESKTOP_FILES})
 #************************************************
 
-install(FILES ${DESKTOP_FILES} DESTINATION /etc/xdg/autostart)
+install(FILES ${DESKTOP_FILES} DESTINATION ${RAZOR_ETC_XDG_DIRECTORY}/autostart)
