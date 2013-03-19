@@ -90,7 +90,7 @@
     <name>RazorPanel</name>
     <message>
         <source>Panel</source>
-        <translation>Not Defteri</translation>
+        <translation>Panel</translation>
     </message>
     <message>
         <source>Configure panel...</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"/>
+        <translation>Kaldır</translation>
     </message>
 </context>
 <context>
