@@ -27,54 +27,87 @@
 
 #include "razorkbindicator.h"
 
+#include <X11/XKBlib.h>
+
 #include <QtGui/QLabel>
+#include <QtGui/QX11Info>
 
-#include "razorkbindicatoreventfilter.h"
+Q_EXPORT_PLUGIN2(panelkbindicator, RazorKbIndicatorLibrary)
 
-
-EXPORT_RAZOR_PANEL_PLUGIN_CPP(RazorKbIndicator)
-
-
-RazorKbIndicator::RazorKbIndicator(const RazorPanelPluginStartInfo *startInfo, QWidget *parent):
-    RazorPanelPlugin(startInfo, parent),
-    content(new QLabel(this)),
-    eventFilter(RazorKbIndicatorEventFilter::instance())
+RazorKbIndicator::RazorKbIndicator(const IRazorPanelPluginStartupInfo &startupInfo):
+    QObject(),
+    IRazorPanelPlugin(startupInfo),
+    mContent(new QLabel())
 {
-    setObjectName("KbIndicator");
+    connect(this, SIGNAL(indicatorsChanged(uint,uint)), this, SLOT(setIndicators(uint,uint)));
+    mContent->setAlignment(Qt::AlignCenter);
 
-    connect(eventFilter, SIGNAL(indicatorsChanged(uint,uint)), this, SLOT(setIndicators(uint,uint)));
+    int code;
+    int major = XkbMajorVersion;
+    int minor = XkbMinorVersion;
+    int XkbErrorBase;
 
-    addWidget(content);
+    mDisplay = QX11Info::display();
+
+    if (XkbLibraryVersion(&major, &minor))
+        if (XkbQueryExtension(mDisplay, &code, &mXkbEventBase, &XkbErrorBase, &major, &minor))
+            if (XkbUseExtension(mDisplay, &major, &minor))
+                XkbSelectEvents(mDisplay, XkbUseCoreKbd, XkbIndicatorStateNotifyMask, XkbIndicatorStateNotifyMask);
 
     settingsChanged();
-    content->setEnabled(eventFilter->getLockStatus(bit));
+    realign();
 }
 
 RazorKbIndicator::~RazorKbIndicator()
 {
+    delete mContent;
+}
+
+QWidget *RazorKbIndicator::widget()
+{
+    return mContent;
 }
 
 void RazorKbIndicator::settingsChanged()
 {
-    bit = settings().value("bit", 0).toInt();
-    content->setText(settings().value("text", QString("C")).toString());
-    content->setEnabled(eventFilter->getLockStatus(bit));
+    mBit = settings()->value("bit", 0).toInt();
+    mContent->setText(settings()->value("text", QString("C")).toString());
+    mContent->setEnabled(getLockStatus(mBit));
 }
 
-void RazorKbIndicator::showConfigureDialog()
+QDialog *RazorKbIndicator::configureDialog()
 {
-    RazorKbIndicatorConfiguration *confWindow = this->findChild<RazorKbIndicatorConfiguration*>("KbIndicatorConfigurationWindow");
+    return new RazorKbIndicatorConfiguration(settings());
+}
 
-    if (!confWindow)
-        confWindow = new RazorKbIndicatorConfiguration(settings(), this);
-
-    confWindow->show();
-    confWindow->raise();
-    confWindow->activateWindow();
+void RazorKbIndicator::realign()
+{
+    mContent->setMinimumSize(panel()->lineSize(), panel()->lineSize());
 }
 
 void RazorKbIndicator::setIndicators(unsigned int changed, unsigned int state)
 {
-    if (changed & (1 << bit))
-        content->setEnabled(state & (1 << bit));
+    if (changed & (1 << mBit))
+        mContent->setEnabled(state & (1 << mBit));
+}
+
+bool RazorKbIndicator::getLockStatus(int bit)
+{
+    bool state = false;
+    if (mDisplay)
+    {
+        unsigned n;
+        XkbGetIndicatorState(mDisplay, XkbUseCoreKbd, &n);
+        state = (n & (1 << bit));
+    }
+    return state;
+}
+
+void RazorKbIndicator::x11EventFilter(XEvent* event)
+{
+    XkbEvent* xkbEvent = reinterpret_cast<XkbEvent*>(event);
+
+    if (xkbEvent->type == mXkbEventBase + XkbEventCode)
+        if (xkbEvent->any.xkb_type == XkbIndicatorStateNotify)
+            emit indicatorsChanged(xkbEvent->indicators.changed, xkbEvent->indicators.state);
 }
