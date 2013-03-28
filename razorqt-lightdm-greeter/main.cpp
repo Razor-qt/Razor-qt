@@ -27,11 +27,12 @@
 #include <QtGui/QDesktopWidget>
 #include "mainwindow.h"
 #include "razortranslate.h"
+#include "razorapplication.h"
 
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    RazorApplication a(argc, argv);
     TRANSLATE_APP;
 
     MainWindow *focusWindow = 0;
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
     {
         MainWindow *w = new MainWindow(i);
         w->show();
-        if (w->isMain())
+        if (w->showLoginForm())
             focusWindow = w;
     }
 
