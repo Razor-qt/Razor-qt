@@ -540,7 +540,19 @@ fi
 if [ x"$BROWSER" = x"" ]; then
     BROWSER=links2:links:lynx:w3m
     if [ -n "$DISPLAY" ]; then
-        BROWSER=firefox:mozilla:epiphany:konqueror:chromium-browser:google-chrome:$BROWSER:arora
+        BROWSER+=:arora
+        BROWSER+=:chromium-browser
+        BROWSER+=:epiphany
+        BROWSER+=:firefox
+        BROWSER+=:google-chrome
+        BROWSER+=:iceweasel
+        BROWSER+=:konqueror
+        BROWSER+=:midori
+        BROWSER+=:mozilla
+        BROWSER+=:opera
+        BROWSER+=:rekonq
+        BROWSER+=:www-browser
+        BROWSER+=:x-www-browser
     fi
 fi
 
