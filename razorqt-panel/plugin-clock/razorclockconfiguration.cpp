@@ -27,6 +27,7 @@
 
 
 #include <QtGui/QInputDialog>
+#include <QColorDialog>
 
 #include "razorclockconfiguration.h"
 #include "ui_razorclockconfiguration.h"
@@ -37,7 +38,8 @@ RazorClockConfiguration::RazorClockConfiguration(QSettings &settings, QWidget *p
     ui(new Ui::RazorClockConfiguration),
     mSettings(settings),
     oldSettings(settings),
-    mOldIndex(1)
+    mOldIndex(1),
+    mDefaultColour(true)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setObjectName("ClockConfigurationWindow");
@@ -60,6 +62,8 @@ RazorClockConfiguration::RazorClockConfiguration(QSettings &settings, QWidget *p
     connect(ui->showDateBelowTimeRB, SIGNAL(clicked()), SLOT(saveSettings()));
 
     connect(ui->autorotateCB, SIGNAL(clicked()), SLOT(saveSettings()));
+    connect(ui->defaultColourCB, SIGNAL(clicked()), SLOT(saveSettings()));
+    connect(ui->chooseColourButton, SIGNAL(clicked()), SLOT(chooseColour()));
 }
 
 RazorClockConfiguration::~RazorClockConfiguration()
@@ -187,6 +191,10 @@ void RazorClockConfiguration::loadSettings()
     mOldIndex = ui->dateFormatCOB->currentIndex();
 
     ui->autorotateCB->setChecked(mSettings.value("autoRotate", true).toBool());
+
+    ui->defaultColourCB->setChecked(mSettings.value("defaultColour", true).toBool());
+    mColour.setNamedColor( mSettings.value("colour").toString() );
+    updateColourBox();
 }
 
 void RazorClockConfiguration::saveSettings()
@@ -212,6 +220,10 @@ void RazorClockConfiguration::saveSettings()
         mSettings.setValue("dateFormat", ui->dateFormatCOB->itemData(ui->dateFormatCOB->currentIndex()));
 
     mSettings.setValue("autoRotate", ui->autorotateCB->isChecked());
+
+    mSettings.setValue("defaultColour", ui->defaultColourCB->isChecked());
+    mSettings.setValue("colour", mColour.name());
+    updateColourBox();
 }
 
 void RazorClockConfiguration::dialogButtonsAction(QAbstractButton *btn)
@@ -265,4 +277,25 @@ void RazorClockConfiguration::dateFormatActivated(int index)
         mOldIndex = index;
 
     saveSettings();
+}
+
+void RazorClockConfiguration::updateColourBox()
+{
+    if (ui->defaultColourCB->isChecked())
+    {
+        ui->chooseColourButton->setEnabled(false);
+        ui->colourLabel->setText("12:34:56");
+    }
+    else
+    {
+        ui->chooseColourButton->setEnabled(true);
+        ui->colourLabel->setText("<font color=" + mColour.name() + ">" + "12:34:56" + "</font>");
+    }
+}
+
+void RazorClockConfiguration::chooseColour()
+{
+    mColour=QColorDialog::getColor(mColour);
+    saveSettings();
+    updateColourBox();
 }

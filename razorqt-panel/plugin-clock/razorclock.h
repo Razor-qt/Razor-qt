@@ -82,6 +82,8 @@ private:
     bool mUseUTC;
     Qt::DayOfWeek mFirstDayOfWeek;
     bool mAutoRotate;
+    bool mDefaultColour;
+    QColor mColour;
 
     QDateTime currentDateTime();
     void showTime(const QDateTime &);
