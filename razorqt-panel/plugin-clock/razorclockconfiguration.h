@@ -72,11 +72,17 @@ private slots:
     void dialogButtonsAction(QAbstractButton *btn);
     void dateFormatActivated(int);
 
+    void chooseColour();
+
 private:
     int mOldIndex;
     QString mCustomDateFormat;
+    bool mDefaultColour;
+    QColor mColour;
 
     void addDateFormat(const QString &format);
+
+    void updateColourBox();
 };
 
 #endif // RAZORCLOCKCONFIGURATION_H

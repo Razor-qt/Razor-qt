@@ -61,7 +61,8 @@ RazorClock::RazorClock(const IRazorPanelPluginStartupInfo &startupInfo):
     QObject(),
     IRazorPanelPlugin(startupInfo),
     mCalendarDialog(0),
-    mAutoRotate(true)
+    mAutoRotate(true),
+    mDefaultColour(true)
 {
     mMainWidget = new QWidget();
     mRotatedWidget = new RotatedWidget(*(new QWidget()), mMainWidget);
@@ -135,14 +136,17 @@ void RazorClock::updateTime()
 
 void RazorClock::showTime(const QDateTime &now)
 {
+    QString preHtml = mDefaultColour ? "" : ("<font color=" + mColour.name() + ">");
+    QString postHtml = mDefaultColour ? "" : "</font>";
+
     if (mDateOnNewLine)
     {
-        mTimeLabel->setText(QLocale::system().toString(now, mTimeFormat));
-        mDateLabel->setText(QLocale::system().toString(now, mDateFormat));
+        mTimeLabel->setText(preHtml + QLocale::system().toString(now, mTimeFormat) + postHtml);
+        mDateLabel->setText(preHtml + QLocale::system().toString(now, mDateFormat) + postHtml);
     }
     else
     {
-        mTimeLabel->setText(QLocale::system().toString(now, mClockFormat));
+        mTimeLabel->setText(preHtml + QLocale::system().toString(now, mClockFormat) + postHtml);
     }
 
     mRotatedWidget->adjustContentSize();
@@ -180,6 +184,9 @@ void RazorClock::settingsChanged()
         mAutoRotate = autoRotate;
         realign();
     }
+
+    mDefaultColour = settings()->value("defaultColour", true).toBool();
+    mColour.setNamedColor( settings()->value("colour").toString() );
 
 
     if (dateBeforeTime)
