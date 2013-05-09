@@ -16,5 +16,7 @@
 %endif
   * debian/copyright
     + updates to new format to make happy debian NMU and DD.
+  * debian/rules:
+    + clean, explain and do cflags parsing manually, so we sure are set, dont trust in debhelper functions
 
  -- %DEBFULLNAME% <%DEBEMAIL%>  %DATE%
