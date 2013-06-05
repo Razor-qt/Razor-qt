@@ -1,0 +1,21 @@
+Rulez:
+* plain color black background
+* bw svg icons 256x256
+
+razor-lightdm-greeter/
+greeter settings and graphics
+
+icons/
+Icons
+
+preview.png
+Theme icon in theme list (appearence settings)
+
+razor-appswitcher.qss
+razor-desktop.qss
+razor-notificationd.qss
+razor-panel.qss
+razor-power.qss
+razor-runner.qss
+wallpaper.cfg
+	Desktop and lightdm (?) backgrounds
