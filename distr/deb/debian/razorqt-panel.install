@@ -5,5 +5,5 @@
 /usr/lib*/razor-panel/
 %endif
 /usr/share/razor/razor-panel/
-/etc/xdg/razor/razor-panel/
+/etc/xdg/razor/*panel*
 /etc/xdg/autostart/razor-panel.desktop
