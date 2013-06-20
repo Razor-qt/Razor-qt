@@ -1,9 +1,11 @@
 %ifnot RELEASE lucid maverick lenny etch squeeze
 /usr/lib/*/librazormount.so.*
 /usr/lib/*/librazorqt.so.*
+/usr/lib/*/librazor-global-key-shortcut*.so.*
 %endif
 %if RELEASE lucid maverick lenny etch squeeze
 /usr/lib*/librazormount.so.*
 /usr/lib*/librazorqt.so.*
+/usr/lib*/librazor-global-key-shortcut*.so.*
 %endif
 /usr/share/librazorqt/
