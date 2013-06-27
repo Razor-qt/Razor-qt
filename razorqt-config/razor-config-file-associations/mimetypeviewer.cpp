@@ -29,6 +29,8 @@
 #include <QPixmap>
 #include <QListWidget>
 #include <QSortFilterProxyModel>
+#include <QtConcurrentRun>
+#include <QDateTime>
 
 #include "qtxdg/xdgmime.h"
 #include "qtxdg/xdgdesktopfile.h"
@@ -39,30 +41,41 @@
 #include "mimetypeviewer.h"
 #include "applicationchooser.h"
 #include "mimetypeitemmodel.h"
+#include "busyindicator.h"
+
+void initializeMimeInfoCache()
+{
+    XdgMimeInfoCache::mediatypes();
+}
 
 MimetypeViewer::MimetypeViewer( QWidget *parent) : 
         m_MimetypeFilterItemModel(this),
-        m_CurrentMime(0)
+        m_CurrentMime(0),
+        mFutureWatcher(0),
+        mBusyIndicator(0)
+
  {
     widget.setupUi(this);
+    addSearchIcon();
+    widget.searchTermLineEdit->setEnabled(false);
 
-    initializeMimeTreeWidget();
-
+    // initialize XdgMimeInfoCache asynchronously while putting a busyindicator on the mimeTypeTreeview
+    mBusyIndicator = new BusyIndicator(widget.mimetypeTreeView);
+    mFutureWatcher = new QFutureWatcher<void>(this);
+    connect(mFutureWatcher, SIGNAL(finished()), this, SLOT(initializeMimetypeTreeView()));
+    mFutureWatcher->setFuture(QtConcurrent::run(initializeMimeInfoCache));
+    
     connect(widget.searchTermLineEdit, SIGNAL(textChanged(const QString&)), 
             &m_MimetypeFilterItemModel, SLOT(setFilterFixedString(const QString&)));
     
     connect(widget.searchTermLineEdit, SIGNAL(textChanged(const QString&)), 
             this, SLOT(autoExpandOnSearch()));
             
-    connect(widget.mimetypeTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), 
-            this, SLOT(currentMimetypeChanged()));
-
 
     connect(widget.chooseApplicationsButton, SIGNAL(clicked()), this, SLOT(chooseApplication()));    
     connect(widget.dialogButtonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(dialogButtonBoxClicked(QAbstractButton*)));
 
     QString defaultsListPath(XdgDirs::dataHome(true) + "/applications/defaults.list");
-    qDebug() << "defaultsListPath:" << defaultsListPath;
     mDefaultsList = new QSettings(defaultsListPath, XdgDesktopFileCache::desktopFileSettingsFormat(), this);
     mSettingsCache = new RazorSettingsCache(mDefaultsList);
     mSettingsCache->loadFromSettings();
@@ -71,12 +84,46 @@ MimetypeViewer::MimetypeViewer( QWidget *parent) :
 MimetypeViewer::~MimetypeViewer() {
 }
 
-void MimetypeViewer::initializeMimeTreeWidget()
+void MimetypeViewer::addSearchIcon()
+{
+    QIcon searchIcon = QIcon::fromTheme("system-search");
+    if (searchIcon.isNull())
+        return;
+
+    widget.searchTermLineEdit->setTextMargins(0, 0, 30, 0);
+    QHBoxLayout *hBoxLayout = new QHBoxLayout(widget.searchTermLineEdit);
+    hBoxLayout->setContentsMargins(0,0,0,0);
+    widget.searchTermLineEdit->setLayout(hBoxLayout);
+    QLabel *searchIconLabel = new QLabel(widget.searchTermLineEdit);
+    searchIconLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    searchIconLabel->setMinimumHeight(30);
+    searchIconLabel->setMinimumWidth(30);
+
+    searchIconLabel->setPixmap(searchIcon.pixmap(QSize(20,20)));
+    hBoxLayout->addWidget(searchIconLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
+}
+
+
+void MimetypeViewer::initializeMimetypeTreeView()
 {
     m_MimetypeFilterItemModel.setSourceModel(new MimetypeItemModel(&m_MimetypeFilterItemModel));
 
     widget.mimetypeTreeView->setModel(&m_MimetypeFilterItemModel);
-    widget.searchTermLineEdit->setFocus();
+    currentMimetypeChanged();
+    widget.mimetypeTreeView->setFocus();
+    widget.searchTermLineEdit->setEnabled(true);
+    
+    connect(widget.mimetypeTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), 
+            this, SLOT(currentMimetypeChanged()));
+
+    delete mBusyIndicator;
+    mBusyIndicator = 0;
+}
+
+void MimetypeViewer::resizeEvent(QResizeEvent* event)
+{
+    if (mBusyIndicator)
+        mBusyIndicator->resize(widget.mimetypeTreeView->size());
 }
 
 void MimetypeViewer::currentMimetypeChanged()
@@ -146,7 +193,6 @@ void MimetypeViewer::currentMimetypeChanged()
 
 void MimetypeViewer::autoExpandOnSearch()
 {
-    qDebug() << "Ind i autoExpandOnSearch...";
     for (int i = 0; i < m_MimetypeFilterItemModel.rowCount(); i++) 
     {
         QModelIndex mediatypeIndex = m_MimetypeFilterItemModel.index(i, 0);
@@ -162,8 +208,15 @@ void MimetypeViewer::chooseApplication()
 {
     if (m_CurrentMime)
     {
-        ApplicationChooser(m_CurrentMime, mDefaultsList, this).exec();    
-        currentMimetypeChanged();
+        ApplicationChooser applicationChooser(m_CurrentMime);
+        if (applicationChooser.exec() && applicationChooser.DefaultApplication())
+        {
+            QString fileNameNoPath = QFileInfo(applicationChooser.DefaultApplication()->fileName()).fileName();
+            mDefaultsList->beginGroup("Default Applications");
+            mDefaultsList->setValue(m_CurrentMime->mimeType(), fileNameNoPath);
+            mDefaultsList->endGroup();   
+            currentMimetypeChanged();
+        }
         widget.mimetypeTreeView->setFocus();
     }
 }

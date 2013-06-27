@@ -83,7 +83,7 @@ public:
     GlobalRazorSettings *mParent;
     QString mIconTheme;
     QString mRazorTheme;
-    qulonglong mThemeUpdated;
+    qlonglong mThemeUpdated;
 
 };
 
@@ -471,13 +471,13 @@ QString RazorThemeData::loadQss(const QString& qssFile) const
  ************************************************/
 QString RazorTheme::desktopBackground(int screen) const
 {
-    QString wallpapperCfgFileName = QString("%1/wallpaper.cfg").arg(d->mPath);
+    QString wallpaperCfgFileName = QString("%1/wallpaper.cfg").arg(d->mPath);
 
-    if (wallpapperCfgFileName.isEmpty())
+    if (wallpaperCfgFileName.isEmpty())
         return QString();
 
-    QSettings s(wallpapperCfgFileName, QSettings::IniFormat);
-    QString themeDir = QFileInfo(wallpapperCfgFileName).absolutePath();
+    QSettings s(wallpaperCfgFileName, QSettings::IniFormat);
+    QString themeDir = QFileInfo(wallpaperCfgFileName).absolutePath();
     // There is something strange... If I remove next line the wallpapers array is not found...
     s.childKeys();
     s.beginReadArray("wallpapers");
@@ -648,7 +648,7 @@ void GlobalRazorSettings::fileChanged()
     }
 
     QString rt = value("theme").toString();
-    qint64 themeUpdated = value("__theme_updated__").toLongLong();
+    qlonglong themeUpdated = value("__theme_updated__").toLongLong();
     if ((d->mRazorTheme != rt) || (d->mThemeUpdated != themeUpdated))
     {
         d->mRazorTheme = rt;
