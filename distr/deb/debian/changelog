@@ -11,8 +11,12 @@
 %ifnot RELEASE lucid maverick lenny etch squeeze
   * debian/control:
     + multiarch support added now.
+    + update depends, cmake >= 2.8.7
+    + added new package libsysstats (*)
   * debian/lib*.install
     + multiarch support added now.
+    + removed librazorqxt and update for new global key shorcut lib
+    + added config file associations app
 %endif
   * debian/copyright
     + updates to new format to make happy debian NMU and DD.
