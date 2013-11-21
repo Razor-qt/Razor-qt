@@ -4,7 +4,7 @@ Exec=razor-power
 Icon=system-shutdown
 Terminal=false
 OnlyShowIn=Razor;
-Categories=Qt;System;Razor;
+Categories=Qt;System;
 Name=Leave
 GenericName=Leave the system
 
