@@ -28,6 +28,7 @@
 #include "command_action.h"
 
 #include <QProcess>
+#include <QObject>
 
 #include <errno.h>
 #include <string.h>
@@ -50,11 +51,9 @@ bool CommandAction::call()
         return false;
     }
 
-    bool result = QProcess::startDetached(mCommand, mArgs);
-    if (!result)
-    {
-        mLogTarget->log(LOG_WARNING, "Failed to launch command \"%s\"%s", qPrintable(mCommand), qPrintable(joinToString(mArgs, " \"", "\" \"", "\"")));
-    }
+    QProcess* proc = new QProcess();
+    QObject::connect(proc, SIGNAL(finished(int)), proc, SLOT(deleteLater()));
+    proc->start(mCommand, mArgs);
 
-    return result;
+    return true;
 }
