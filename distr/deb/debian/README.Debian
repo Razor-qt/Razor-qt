@@ -8,7 +8,7 @@ send or ask question, the release and version of lightdm core and libraries.
 %endif
 
 Theres new sensor plugin, in panel, for correct work u must update and configure 
-the sensors throught sensors-detect command with root cow powers, and then the plugin 
+the sensors through sensors-detect command with root cow powers, and then the plugin 
 can work an show right values; if not it will show indicators bars up and down constantly.
 
 Volume plugin and mixer settings must depend on package distribution, Razor-qt 
