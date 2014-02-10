@@ -115,8 +115,12 @@ void QuickLaunchAction::execAction()
     switch (m_type)
     {
         case ActionLegacy:
-            QProcess::startDetached(exec);
+	{
+            QProcess* proc = new QProcess();
+	    connect(proc, SIGNAL(finished(int)), proc, SLOT(deleteLater()));
+	    proc->start(exec);
             break;
+	}
         case ActionXdg:
         {
             XdgDesktopFile * xdg = XdgDesktopFileCache::getFile(exec);

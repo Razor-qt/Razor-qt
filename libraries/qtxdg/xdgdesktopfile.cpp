@@ -54,6 +54,7 @@
 #include <QSettings>
 #include <QTextStream>
 #include <QFile>
+#include <QObject>
 /************************************************
 
  ************************************************/
@@ -360,7 +361,10 @@ bool XdgDesktopFileData::startApplicationDetached(const XdgDesktopFile *q, const
     }
 
     QString cmd = args.takeFirst();
-    return QProcess::startDetached(cmd, args);
+    QProcess* proc = new QProcess();
+    QObject::connect(proc,SIGNAL(finished(int)),proc,SLOT(deleteLater()));
+    proc->start(cmd, args);
+    return true;
 }
 
 
