@@ -4,40 +4,54 @@
 #export DH_VERBOSE=1
 
 
+# multiarch support are added automatically in debhelper 9, but we need conserve this for backguards
 %ifnot RELEASE lucid maverick lenny etch squeeze
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 %endif
 
-# the  -Wl,--as-needed will fail under lenny/etch, umm i dont care stupid winbuntu but added for razorqt happy team..
+
+# the  -Wl,--as-needed will fail under lenny/etch, so this will need for older still supported distro
 %ifnot RELEASE lucid maverick lenny etch squeeze
 #export DEB_BUILD_MAINT_OPTIONS   := hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND  := -Wl,--as-needed
 %endif
-# This dont work, the cflags and cxxflags are set from qt framework, i dont remenber right now but later i'll fixed! i'm currently working on with debian oficial qt related packages
-# CMake doesn't use CPPFLAGS, pass them to CFLAGS/CXXFLAGS instead (bug #662833)
-#%ifnot RELEASE lucid lenny etch
-#export DEB_CFLAGS_MAINT_APPEND   := -pipe -Wall $(shell dpkg-buildflags --get CPPFLAGS)
-#export DEB_CXXFLAGS_MAINT_APPEND := -pipe -Wall $(shell dpkg-buildflags --get CPPFLAGS)
-#%endif
 
-
-%:
-#	dh $@ --buildsystem=cmake --parallel
-#%ifnot RELEASE lucid maverick lenny etch
-	dh $@ --buildsystem=cmake
-#%endif
-# This dont work, due lenny and etch type must have debhelper from backports so its nonsense!
-#%if RELEASE lucid maverick lenny etch
-#	dh $@
-#%endif
-
-%ifnot RELEASE lucid maverick lenny etch squeeze
-override_dh_auto_configure:
-	dh_auto_configure -- -DLIB_SUFFIX="/$(DEB_HOST_MULTIARCH)"
-override_dh_makeshlibs:
-	dh_makeshlibs -X/usr/lib/$(DEB_HOST_MULTIARCH)/razor-desktop
+# i dont know if this work, or if i set throught DEB_CXXFLAGS_MAINT_APPEND due with --buildsystem=cmake could work...
+# so then i prefer set usng cmake real parameters and dont let to debhelper 
+# due debhelper guys changes many things between releases somethings...
+%if RELEASE lucid maverick lenny etch
+ifeq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+CMAKE_CFLAGS_OPTIONS = -O2 $(CFLAGS)  $(CXXFLAGS)
+else
+CMAKE_CFLAGS_OPTIONS = -O0 $(CFLAGS)  $(CXXFLAGS)
+endif
+%else
+CMAKE_CFLAGS_OPTIONS=$(shell dpkg-buildflags --get CFLAGS) $(shell dpkg-buildflags --get CXXFLAGS)
 %endif
 
-# we need this for see changes in files installing over razorqt updates
+# begin of debian rules parsing
+%:
+
+# parallel build was introduced into debhelper >= 7.5 so then squeeze must have support
+%ifnot RELEASE lucid maverick lenny etch
+	dh $@ --buildsystem=cmake --parallel
+%else
+	dh $@ --buildsystem=cmake
+%endif
+
+# multiarch support are added automatically in debhelper 9, but we need conserve this for backguards
+# also set manually flags here rather than use DEB_CXXFLAGS_MAINT_APPEND due with --buildsystem=cmake could not work...
+override_dh_auto_configure:
+%ifnot RELEASE lucid maverick lenny etch squeeze
+	dh_auto_configure -- -DLIB_SUFFIX="/$(DEB_HOST_MULTIARCH)" -DCMAKE_CXX_FLAGS_RELEASE="$(CMAKE_CFLAGS_OPTIONS)" -DCMAKE_CXX_FLAGS="$(CMAKE_CFLAGS_OPTIONS)"
+%else
+	dh_auto_configure -- -DCMAKE_CXX_FLAGS_RELEASE="$(CMAKE_CFLAGS_OPTIONS)" -DCMAKE_CXX_FLAGS="$(CMAKE_CFLAGS_OPTIONS)"
+%endif
+
+# avoid search in previously installed versions or prevously installed older distributions
+override_dh_makeshlibs:
+	dh_makeshlibs -X/usr/lib/$(DEB_HOST_MULTIARCH)/razor-desktop -X/usr/lib/razor-desktop
+
+# packagers need this for see changes in files installing over razorqt updates
 override_dh_install:
 	dh_install --list-missing --sourcedir=debian/tmp

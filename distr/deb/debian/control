@@ -21,7 +21,7 @@ Build-Depends: pkg-config,
 %else
     debhelper (>= 7.0.50~),
 %endif
-    cmake,
+    cmake (>= 2.8.7-1),
     libqt4-dev (>= 4.6.0),
     libmagic-dev,
     libxrender-dev,

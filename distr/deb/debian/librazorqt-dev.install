@@ -1,12 +1,16 @@
 /usr/include/razormount/
 /usr/include/razorqt/
-/usr/include/razorqxt/
+/usr/include/razor-global-key-shortcut*
+/usr/include/razor-global-key-shortcut-selector/
+/usr/include/razor-global-key-shortcut-client/
 /usr/bin/razor-x11info
 %ifnot RELEASE lucid maverick lenny etch squeeze
 /usr/lib/*/pkgconfig/razor*.pc
 /usr/lib/*/librazor*.so
+/usr/lib/*/librazor-global-key-shortcut*.so
 %endif
 %if RELEASE lucid maverick lenny etch squeeze
 /usr/lib*/pkgconfig/razor*.pc
 /usr/lib*/librazor*.so
+/usr/lib/librazor-global-key-shortcut*.so
 %endif
